@@ -13,11 +13,11 @@ export function SalesTable({ sales, onDelete }: SalesTableProps) {
 
     const getStatusStyle = (status: string) => {
         switch (status.toLowerCase()) {
-            case 'completed':
+            case 'Terminé':
                 return 'bg-green-500/20 text-green-400';
-            case 'pending':
+            case 'En attente':
                 return 'bg-yellow-500/20 text-yellow-400';
-            case 'cancelled':
+            case 'Annulé':
                 return 'bg-red-500/20 text-red-400';
             default:
                 return 'bg-gray-500/20 text-gray-400';

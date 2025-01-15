@@ -6,10 +6,8 @@ export interface Sale {
   unitCost: number;
   margin: number;
   date: string;
-  client?: string;
   paymentMethod: 'cash' | 'card' | 'transfer';
-  paymentStatus: 'pending' | 'completed' | 'cancelled';
-  notes?: string;
+  paymentStatus: 'En attente' | 'Terminé' | 'Annulé';
 }
 
 export type Period = 'day' | 'week' | 'month' | 'year';

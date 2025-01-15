@@ -159,7 +159,7 @@ export function SalesView() {
         <div className="space-y-4">
           <div className="bg-black border border-white/10 rounded-xl p-4 h-[310px]">
             <h3 className="text-sm mb-4 text-center text-zinc-400">Statistiques</h3>
-            <div className="space-y-3">
+            <div className="space-y-6">
               <StatsCard
                 label="Panier Moyen (Quantité)"
                 value={totalSalesCount ? (totalQuantity / totalSalesCount).toFixed(2) : '0'}
