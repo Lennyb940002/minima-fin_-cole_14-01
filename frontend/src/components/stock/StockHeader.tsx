@@ -8,7 +8,7 @@ interface StockHeaderProps {
 
 export function StockHeader({ onAddStock }: StockHeaderProps) {
     return (
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-8 border-b border-white/10 h-20">
             <h1 className="text-2xl font-bold text-white">Gestion des Stocks</h1>
             <button
                 onClick={onAddStock}

@@ -16,7 +16,7 @@ export interface ISale extends Document {
     quantity: number;
     sellingPrice: number;
     purchasePrice: number;
-    status: 'pending' | 'completed' | 'cancelled';
+    status: 'En attente' | 'Effectué' | 'Annulé';
     paymentMethod: 'cash' | 'card' | 'transfer';
     customerName?: string;
     notes?: string;

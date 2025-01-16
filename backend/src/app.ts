@@ -1,3 +1,4 @@
+// src/app.ts
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -6,11 +7,12 @@ import { authRouter } from './routes/authRoutes';
 import { stockRouter } from './routes/stockRoutes';
 import { saleRouter } from './routes/saleRoutes';
 import { productRouter } from './routes/productRoutes';
+import { declarationRouter } from './routes/declarationRoutes'; // Importer le routeur des déclarations
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001; // Assurez-vous que le port est 3000
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
@@ -32,6 +34,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/stock', stockRouter);
 app.use('/api/sales', saleRouter);
 app.use('/api/products', productRouter);
+app.use('/api/declarations', declarationRouter); // Utiliser le routeur des déclarations
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

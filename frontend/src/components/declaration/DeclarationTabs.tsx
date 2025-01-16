@@ -29,3 +29,5 @@ export function DeclarationTabs({ activeTab, onTabChange }: DeclarationTabsProps
         </div>
     );
 }
+
+export default DeclarationTabs;

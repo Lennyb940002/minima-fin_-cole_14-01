@@ -110,8 +110,10 @@ export function SalesView() {
   const totalBenefit = filteredBenefitSales.reduce((sum, sale) => sum + sale.margin, 0);
 
   return (
-    <div className="relative space-y-6">
-      <h2 className="text-xl font-bold">Gestion de Vente</h2>
+    <div className=" relative space-y-6">
+      <header className='border-b border-white/10 h-12'>
+        <h2 className="text-2xl font-bold">Gestion de Vente</h2>
+      </header>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
         <SalesOverviewCard
           title="Vue d'ensemble du CA"

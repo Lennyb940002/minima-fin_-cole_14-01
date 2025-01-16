@@ -169,9 +169,9 @@ export function ProductModal({ isOpen, onClose, onSubmit }: ProductModalProps) {
                             value={formData.paymentStatus}
                             onChange={handleChange}
                         >
-                            <option className="text-black" value="pending">En attente</option>
-                            <option className="text-black" value="completed">Effectué</option>
-                            <option className="text-black" value="cancelled">Annulé</option>
+                            <option className="text-black" value="En attente">En attente</option>
+                            <option className="text-black" value="Effectué">Effectué</option>
+                            <option className="text-black" value="Annulé">Annulé</option>
                         </select>
                     </div>
 

@@ -27,6 +27,18 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
     }
   };
 
+  const getBadgeColor = (category: string) => {
+    switch (category) {
+      case 'Marketing': return 'bg-purple-500';
+      case 'Sales': return 'bg-yellow-500';
+      case 'Operations': return 'bg-cyan-500';
+      default: return 'bg-red-500';
+    }
+  };
+
+  // Function to sort transactions by date (most recent first)
+  const sortedTransactions = transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
   return (
     <div className="bg-black rounded-lg border border-white/10 overflow-hidden">
       <table className="w-full">
@@ -35,18 +47,25 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
             <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Date</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Catégorie</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Description</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Type</th>
             <th className="px-4 py-3 text-right text-sm font-medium text-white/60">Montant</th>
           </tr>
         </thead>
         <tbody>
-          {transactions.map((transaction) => (
+          {sortedTransactions.map((transaction) => (
             <tr key={transaction.id} className="border-b border-white/10">
               <td className="px-4 py-3 text-sm text-white">{transaction.date}</td>
-              <td className="px-4 py-3 text-sm text-white">{transaction.category}</td>
+              <td className="px-4 py-3 text-sm text-white">
+                <span className={`inline-block w-3 h-3 rounded-full mr-2 ${getBadgeColor(transaction.category)}`}></span>
+                {transaction.category}
+              </td>
               <td className="px-4 py-3 text-sm text-white">
                 <span className={`px-2 py-1 rounded-full text-xs ${getColorScheme(transaction.type, transaction.category)}`}>
                   {transaction.description}
                 </span>
+              </td>
+              <td className="px-4 py-3 text-sm text-white">
+                {transaction.type === 'income' ? 'Rentrée d\'argent' : 'Dépense'}
               </td>
               <td className={`px-4 py-3 text-sm text-right ${getTextColor(transaction.type, transaction.category)}`}>
                 {transaction.type === 'expense' ? '- ' : '+ '}

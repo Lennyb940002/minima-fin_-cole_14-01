@@ -7,7 +7,7 @@ export interface Sale {
   margin: number;
   date: string;
   paymentMethod: 'cash' | 'card' | 'transfer';
-  paymentStatus: 'En attente' | 'Terminé' | 'Annulé';
+  paymentStatus: 'En attente' | 'Effectué' | 'Annulé';
 }
 
 export type Period = 'day' | 'week' | 'month' | 'year';
