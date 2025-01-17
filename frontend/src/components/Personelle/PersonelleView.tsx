@@ -45,14 +45,27 @@ export default function FocusTimer() {
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
+    useEffect(() => {
+        if (isFlashing) {
+            document.documentElement.classList.add('flashing');
+        } else {
+            document.documentElement.classList.remove('flashing');
+        }
+    }, [isFlashing]);
+
     return (
-        <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 
-            ${isFlashing ? 'animate-[flash_1s_ease-in-out_infinite]' : 'bg-black'}
-        `}>
+        <div className="min-h-screen flex items-center justify-center transition-colors duration-300 bg-black">
             <style jsx global>{`
                 @keyframes flash {
                     0%, 100% { background-color: black; }
                     50% { background-color: rgb(153, 27, 27); }
+                }
+                .flashing {
+                    animation: flash 1s ease-in-out infinite;
+                }
+                html, body {
+                    height: 100%;
+                    margin: 0;
                 }
             `}</style>
 
