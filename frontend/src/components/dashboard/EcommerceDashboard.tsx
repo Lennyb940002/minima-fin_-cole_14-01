@@ -1,6 +1,6 @@
 import React from 'react';
 import { SalesView } from '../sales/SalesView';
-import { StockView } from '../stock/StockView';;
+import { StockView } from '../stock/StockView';
 import { AccountingView } from '../accounting/AccountingView';
 import { DeclarationView } from '../declaration/DeclarationView';
 import { ProductView } from '../product/ProductView';
@@ -71,21 +71,21 @@ export function EcommerceDashboard() {
   if (activeModule === 'marketing') return <MarketingCalendar />;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 mt-14">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6 mt-14">
       {modules.map((module) => (
         <div
           key={module.id}
           onClick={() => setActiveModule(module.id)}
           onMouseEnter={() => setHoveredModule(module.id)}
           onMouseLeave={() => setHoveredModule(null)}
-          className="w-[380px] h-[260px] rounded-[25px] border border-white/90 p-6 transition-all hover:bg-white group cursor-pointer flex flex-col items-center"
+          className="w-full h-[260px] rounded-[25px] border border-white/90 p-6 transition-all hover:bg-white group cursor-pointer flex flex-col items-center"
         >
           <img
             src={hoveredModule === module.id ? module.iconBlack : module.iconWhite}
             alt={`${module.title} icon`}
-            className="w-24 h-24 mb-4 mt-8 transition-all "
+            className="w-24 h-24 mb-4 mt-8 transition-all"
           />
-          <h3 className="text-xl font text-white group-hover:text-black mb-2">
+          <h3 className="text-xl font text-white group-hover:text-black mb-2 text-center">
             {module.title}
           </h3>
         </div>
