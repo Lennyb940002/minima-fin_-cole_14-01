@@ -1,4 +1,3 @@
-//routes/saleRoutes.ts
 import { Router, Response } from 'express';
 import { auth } from '../middleware/auth';
 import { SaleService } from '../services/saleService';
@@ -19,7 +18,7 @@ saleRouter.get('/', async (req: AuthRequest, res: Response) => {
 
 saleRouter.post('/', async (req: AuthRequest, res: Response) => {
     try {
-        console.log('Received sale data:', req.body);
+        console.log('Received sale data:', req.body); // Log the received data
         console.log('Authenticated user:', req.user); // Log the user
 
         const sale = await SaleService.create(req.body, req.user!.userId);

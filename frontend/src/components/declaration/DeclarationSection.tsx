@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Calendar } from 'lucide-react';
 
 // Types
 interface Declaration {
@@ -38,7 +38,7 @@ const formatPeriodLabel = (date: string, periodType: 'monthly' | 'quarterly'): s
 };
 
 const formatCurrency = (amount: number): string => {
-    return `${amount.toFixed(2)} €`;
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 };
 
 // Declaration Card Component
@@ -51,23 +51,29 @@ const DeclarationCard = ({
     onDeclare: (d: Declaration) => void,
     onSimulate: (d: Declaration) => void
 }) => (
-    <div className="bg-white/5 p-6 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-200">
-        <div className="mb-4">
-            <h4 className="text-3xl font-bold mb-3">
-                {formatPeriodLabel(declaration.date, 'monthly')}
-            </h4>
+    <div className="bg-white/5 p-6 rounded-xl border border-white/10 hover:border-white/20 hover:bg-white/[0.07] transition-all duration-200">
+        <div className="mb-6">
+            <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-blue-500/10 rounded-lg">
+                    <Calendar className="w-5 h-5 text-blue-400" />
+                </div>
+                <h4 className="text-2xl font-bold text-white">
+                    {formatPeriodLabel(declaration.date, 'monthly')}
+                </h4>
+            </div>
 
-            <div className="flex flex-col space-y-2">
-                <div className="flex justify-between items-center py-2 border-b border-white/10">
-                    <p className="text-base text-gray-400">
-                        Chiffre d'affaire
+            <div className="space-y-4">
+                <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                    <p className="text-sm text-gray-400 mb-1">
+                        Chiffre d'affaires
                     </p>
-                    <p className="text-xl font-medium">
+                    <p className="text-xl font-medium text-white">
                         {formatCurrency(declaration.payment)}
                     </p>
                 </div>
-                <div className="flex justify-between items-center py-2">
-                    <p className="text-base text-gray-400">
+
+                <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                    <p className="text-sm text-blue-300 mb-1">
                         Cotisations estimées
                     </p>
                     <p className="text-2xl font-semibold text-blue-400">
@@ -77,23 +83,28 @@ const DeclarationCard = ({
             </div>
         </div>
 
-        <p className="text-sm text-gray-400 mb-6">
-            À déclarer avant {DECLARATION_DEADLINE_DAYS} jours
-        </p>
-
-        <div className="flex justify-between gap-4 px-4">
+        <div className="flex items-center justify-between gap-4">
             <button
                 onClick={() => onSimulate(declaration)}
-                className="flex items-center gap-2 text-gray-400 hover:text-blue-400 transition-colors duration-200 text-lg font-medium"
+                className="flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-blue-400 hover:bg-white/5 rounded-lg transition-all duration-200"
             >
-                <ArrowLeft className="w-5 h-5" /> Simuler
+                <ArrowLeft className="w-4 h-4" />
+                <span className="font-medium">Simuler</span>
             </button>
             <button
                 onClick={() => onDeclare(declaration)}
-                className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors duration-200 text-lg font-medium"
+                className="flex items-center gap-2 px-4 py-2 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 rounded-lg transition-all duration-200"
             >
-                Déclarer <ArrowRight className="w-5 h-5" />
+                <span className="font-medium">Déclarer</span>
+                <ArrowRight className="w-4 h-4" />
             </button>
+        </div>
+
+        <div className="mt-4 pt-4 border-t border-white/10">
+            <p className="text-sm text-gray-400 flex items-center gap-2">
+                <div className="h-2 w-2 bg-yellow-500 rounded-full"></div>
+                À déclarer avant {DECLARATION_DEADLINE_DAYS} jours
+            </p>
         </div>
     </div>
 );
@@ -108,17 +119,28 @@ export function DeclarationSection({
 }: DeclarationSectionProps) {
     return (
         <div className="space-y-6">
-            <h3 className="text-2xl font-semibold text-white mb-6">{title}</h3>
+            <div className="flex items-center gap-3">
+                <h3 className="text-2xl font-semibold text-white">{title}</h3>
+                <div className="px-3 py-1 bg-white/5 rounded-full text-sm text-gray-400">
+                    {items.length}
+                </div>
+            </div>
 
             <div className="grid gap-6">
-                {items.map((declaration) => (
-                    <DeclarationCard
-                        key={declaration.date}
-                        declaration={declaration}
-                        onDeclare={onDeclare}
-                        onSimulate={onSimulate}
-                    />
-                ))}
+                {items.length > 0 ? (
+                    items.map((declaration) => (
+                        <DeclarationCard
+                            key={declaration.date}
+                            declaration={declaration}
+                            onDeclare={onDeclare}
+                            onSimulate={onSimulate}
+                        />
+                    ))
+                ) : (
+                    <div className="p-8 text-center">
+                        <p className="text-gray-400">Aucune déclaration</p>
+                    </div>
+                )}
             </div>
         </div>
     );

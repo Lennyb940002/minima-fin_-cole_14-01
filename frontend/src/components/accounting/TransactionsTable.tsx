@@ -7,32 +7,43 @@ interface TransactionsTableProps {
 }
 
 export function TransactionsTable({ transactions }: TransactionsTableProps) {
-  const getColorScheme = (type: string, category: string) => {
-    if (type === 'income') return 'bg-blue-500/20 text-blue-400';
-    switch (category) {
-      case 'Marketing': return 'bg-purple-500/20 text-purple-400';
-      case 'Sales': return 'bg-yellow-500/20 text-yellow-400';
-      case 'Operations': return 'bg-cyan-500/20 text-cyan-400';
-      default: return 'bg-red-500/20 text-red-400';
+
+  const getColorScheme = (type: 'income' | 'expense', category: string) => {
+    if (type === 'income') {
+      switch (category) {
+        case 'Sales': return 'bg-green-500/20 text-green-400';
+        case 'Stock': return 'bg-orange-500/20 text-orange-400';
+        case 'Marketing': return 'bg-purple-500/20 text-purple-400';
+        case 'Déclaration': return 'bg-red-500/20 text-red-400';
+        default: return 'bg-gray-500/20 text-gray-400';
+      }
+    } else {
+      switch (category) {
+        case 'Stock': return 'bg-orange-500/20 text-orange-400';
+        case 'Déclaration': return 'bg-red-500/20 text-red-400';
+        case 'Marketing': return 'bg-purple-500/20 text-purple-400';
+        default: return 'bg-gray-500/20 text-gray-400';
+      }
     }
   };
 
-  const getTextColor = (type: string, category: string) => {
-    if (type === 'income') return 'text-blue-500';
+  const getTextColor = (type: 'income' | 'expense', category: string) => {
+    if (type === 'income') return 'text-green-500';
     switch (category) {
+      case 'Stock': return 'text-orange-500';
+      case 'Déclaration': return 'text-red-500';
       case 'Marketing': return 'text-purple-500';
-      case 'Sales': return 'text-yellow-500';
-      case 'Operations': return 'text-cyan-500';
-      default: return 'text-red-500';
+      default: return 'text-gray-500';
     }
   };
 
   const getBadgeColor = (category: string) => {
     switch (category) {
+      case 'Sales': return 'bg-green-500';
+      case 'Stock': return 'bg-orange-500';
       case 'Marketing': return 'bg-purple-500';
-      case 'Sales': return 'bg-yellow-500';
-      case 'Operations': return 'bg-cyan-500';
-      default: return 'bg-red-500';
+      case 'Déclaration': return 'bg-red-500';
+      default: return 'bg-gray-500';
     }
   };
 
@@ -53,15 +64,15 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
         </thead>
         <tbody>
           {sortedTransactions.map((transaction) => (
-            <tr key={transaction.id} className="border-b border-white/10">
-              <td className="px-4 py-3 text-sm text-white">{transaction.date}</td>
+            <tr key={transaction.id || transaction.date} className="border-b border-white/10">
+              <td className="px-4 py-3 text-sm text-white">{new Date(transaction.date).toLocaleDateString()}</td>
               <td className="px-4 py-3 text-sm text-white">
                 <span className={`inline-block w-3 h-3 rounded-full mr-2 ${getBadgeColor(transaction.category)}`}></span>
                 {transaction.category}
               </td>
               <td className="px-4 py-3 text-sm text-white">
                 <span className={`px-2 py-1 rounded-full text-xs ${getColorScheme(transaction.type, transaction.category)}`}>
-                  {transaction.description}
+                  {transaction.description || 'No Description'}
                 </span>
               </td>
               <td className="px-4 py-3 text-sm text-white">
@@ -69,7 +80,7 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
               </td>
               <td className={`px-4 py-3 text-sm text-right ${getTextColor(transaction.type, transaction.category)}`}>
                 {transaction.type === 'expense' ? '- ' : '+ '}
-                {formatCurrency(transaction.amount)}
+                {formatCurrency(transaction.amount || 0)}
               </td>
             </tr>
           ))}

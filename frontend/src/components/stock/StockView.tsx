@@ -1,10 +1,10 @@
-// components/stock/StockView.tsx
 import React, { useState, useEffect } from 'react';
 import { StockTable } from './StockTable';
 import { StockSummary } from './StockSummary';
 import { StockModal } from './StockModal';
 import { LowStockPanel } from './LowStockPanel';
 import { StockHeader } from './StockHeader';
+import StockChart from './StockChart';
 import type { StockItem, StockAnalytics } from './types';
 import { stockApi } from '../../services/stockApi';
 
@@ -42,32 +42,68 @@ export function StockView() {
   }, []);
 
   if (loading) {
-    return <div className="p-6">
-      <div className="text-white text-center">Chargement des données...</div>
-    </div>;
+    return (
+      <div className="p-6">
+        <div className="text-white text-center">Chargement des données...</div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="p-6">
-      <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded">
-        {error}
+    return (
+      <div className="p-6">
+        <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded">
+          {error}
+        </div>
       </div>
-    </div>;
+    );
   }
+
+  // Prepare data for chart
+  const chartData = items.map(item => ({
+    date: item.createdAt.toISOString().split('T')[0],
+    quantity: item.quantity,
+  }));
+
+  const handleCreateStock = async (stock: Omit<StockItem, 'id' | 'lastUpdated' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      await stockApi.createStock({
+        ...stock,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        lastUpdated: new Date(),
+      });
+      await loadData();
+    } catch (error) {
+      console.error('Erreur lors de la création du stock :', error);
+      setError('Erreur lors de la création du stock.');
+    }
+  };
+
+  const handleUpdateStock = async (id: string, data: Partial<StockItem>) => {
+    try {
+      await stockApi.updateStock(id, {
+        ...data,
+        updatedAt: new Date(),
+        lastUpdated: new Date(),
+      });
+      await loadData();
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du stock :', error);
+      setError('Erreur lors de la mise à jour du stock.');
+    }
+  };
 
   return (
     <div className="p-6 space-y-6">
       <StockHeader onAddStock={() => setIsModalOpen(true)} />
-      <StockSummary analytics={analytics} />
+      <StockSummary analytics={analytics} items={items} />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
           <StockTable
             items={items}
-            onUpdate={async (id, data) => {
-              await stockApi.updateStock(id, data);
-              await loadData();
-            }}
+            onUpdate={handleUpdateStock}
             onDelete={async (id) => {
               await stockApi.deleteStock(id);
               await loadData();
@@ -85,14 +121,15 @@ export function StockView() {
         </div>
       </div>
 
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold text-white mb-4">Évolution du Stock</h2>
+        <StockChart items={chartData} />
+      </div>
+
       <StockModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={async (stock) => {
-          await stockApi.createStock(stock);
-          setIsModalOpen(false);
-          await loadData();
-        }}
+        onSubmit={handleCreateStock}
       />
     </div>
   );

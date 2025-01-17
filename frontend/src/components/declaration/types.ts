@@ -1,16 +1,18 @@
+// src/components/declaration/types.ts
+
 export interface Declaration {
   id: string;
-  type: string;
-  dueDate: string;
-  amount: number;
-  status: 'pending' | 'submitted' | 'late';
-  submissionDate?: string;
+  status: 'pending' | 'paid' | 'processing';
+  paymentDate?: string;
+  lastModified: string;
+  // autres champs...
 }
 
-export interface Obligation {
-  id: string;
-  title: string;
-  description: string;
-  dueDate: string;
-  priority: 'high' | 'medium' | 'low';
+export class DeclarationError extends Error {
+  code: string;
+
+  constructor({ message, code }: { message: string; code: string }) {
+    super(message);
+    this.code = code;
+  }
 }

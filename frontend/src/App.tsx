@@ -4,7 +4,7 @@ import { AuthForm } from './components/auth/AuthForm';
 import { Header } from './components/layout/Header';
 import { EcommerceDashboard } from './components/dashboard/EcommerceDashboard';
 import SeanceSport from './components/sport/SeanceSport';
-import PersoView from './components/Personelle/PersoView';
+import FocusTimer from './components/Personelle/PersonelleView';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -40,7 +40,7 @@ const MainContent = () => {
           <Route path="/" element={<Navigate to="/ecommerce" replace />} />
           <Route path="/ecommerce" element={<EcommerceDashboard />} />
           <Route path="/sceance-sport" element={<SeanceSport />} />
-          <Route path="/suivi-personnel" element={<PersoView />} />
+          <Route path="/suivi-personnel" element={<FocusTimer />} />
         </Routes>
       </main>
     </div>

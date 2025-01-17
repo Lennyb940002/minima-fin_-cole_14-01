@@ -1,6 +1,7 @@
+// types.ts
 export interface Transaction {
-  id: string;
-  date: string;
+  id: any;
+  date: any;
   category: string;
   description: string;
   amount: number;
@@ -12,11 +13,3 @@ export interface FinancialSummary {
   expenses: number;
   profit: number;
 }
-
-export type TransactionCategory =
-  | 'E-commerce'
-  | 'Magasin physique'
-  | 'Marketing'
-  | 'Administratif'
-  | 'Impôts'
-  | 'Inventaire';

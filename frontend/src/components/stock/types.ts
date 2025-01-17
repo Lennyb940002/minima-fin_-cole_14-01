@@ -10,6 +10,8 @@ export interface StockItem {
   description?: string;
   threshold: number;
   lastUpdated: Date;
+  createdAt: Date; // Ajoutez cette ligne
+  updatedAt: Date; // Ajoutez cette ligne
 }
 
 export interface StockAnalytics {

@@ -1,28 +1,36 @@
-// components/stock/StockSummary.tsx
-
 import React from 'react';
-import { Package, ShoppingCart, AlertTriangle } from 'lucide-react';
-import { StockAnalytics } from './types';
+import { StockAnalytics, StockItem } from './types';
 import { formatCurrency } from './utils/stockUtils';
 import { StockSummaryCard } from './StockSummaryCard';
 
 interface StockSummaryProps {
     analytics: StockAnalytics;
+    items: StockItem[];
 }
 
-export function StockSummary({ analytics }: StockSummaryProps) {
+export function StockSummary({ analytics, items }: StockSummaryProps) {
+    // Calculer la quantité totale de tous les produits
+    const totalQuantity = items.reduce((acc, item) => acc + item.quantity, 0);
+
+    // Calculer la valeur totale du stock
+    const totalStockValue = items.reduce((acc, item) => acc + (item.salePrice * item.quantity), 0);
+
+    // Compter combien de produits sont en seuil critique
+    const lowStockCount = items.filter(item => item.quantity <= item.threshold).length;
+
+    // Préparer les éléments de résumé
     const summaryItems = [
         {
             title: 'Produits totaux',
-            value: analytics.totalProducts?.toString() || '0',
+            value: totalQuantity.toString()
         },
         {
             title: 'Valeur du stock',
-            value: analytics.totalValue ? formatCurrency(analytics.totalValue) : '0,00 €',
+            value: formatCurrency(totalStockValue)
         },
         {
             title: 'Stock faible',
-            value: analytics.lowStockCount?.toString() || '0',
+            value: lowStockCount.toString()
         }
     ];
 

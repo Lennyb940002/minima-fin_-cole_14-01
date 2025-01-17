@@ -1,4 +1,3 @@
-// components/stock/StockModal.tsx
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { StockItem } from './types';
@@ -6,35 +5,38 @@ import { StockItem } from './types';
 interface AddStockModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (stock: Omit<StockItem, 'id'>) => Promise<void>;
+    onSubmit: (stock: Omit<StockItem, 'id' | 'lastUpdated' | 'createdAt' | 'updatedAt'>) => Promise<void>;
 }
 
 const initialFormState = {
-    product: '',
+    name: '',
     reference: '',
-    quantity: 1,
+    category: '',
+    quantity: 0,
+    minQuantity: 0,
+    price: 0,
+    description: '',
+    product: '',
     unitPrice: 0,
     salePrice: 0,
-    threshold: 5,
-    category: '',
+    threshold: 0,
     autoGenerateReference: true
 };
 
 export function StockModal({ isOpen, onClose, onSubmit }: AddStockModalProps) {
     const [formData, setFormData] = useState(initialFormState);
+    const [error, setError] = useState<string | null>(null);
 
     if (!isOpen) return null;
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
-        const { name, value, type, checked } = e.target;
+        const { name, value, type } = e.target;
+        console.log(`handleChange - ${name}: ${value}`);
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked :
-                ['quantity', 'unitPrice', 'salePrice', 'threshold'].includes(name)
-                    ? parseFloat(value)
-                    : value
+            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
         }));
     };
 
@@ -47,21 +49,27 @@ export function StockModal({ isOpen, onClose, onSubmit }: AddStockModalProps) {
 
         try {
             const stockData = {
-                name: formData.product,
+                name: formData.name,
                 reference: reference,
-                quantity: formData.quantity,
-                price: formData.unitPrice,
-                salePrice: formData.salePrice,
-                minQuantity: formData.threshold,
                 category: formData.category,
-                description: ''
+                quantity: Number(formData.quantity),
+                minQuantity: Number(formData.minQuantity),
+                price: Number(formData.price),
+                description: formData.description,
+                product: formData.product,
+                unitPrice: Number(formData.unitPrice),
+                salePrice: Number(formData.salePrice),
+                threshold: Number(formData.threshold),
             };
 
-            console.log('Submitting stock data:', stockData);
+            console.log('handleSubmit - stockData:', stockData);
             await onSubmit(stockData);
             setFormData(initialFormState);
+            setError(null);
+            onClose(); // Fermeture de la modal après succès
         } catch (error) {
-            console.error('Error submitting stock:', error);
+            console.error('handleSubmit - Error submitting stock:', error);
+            setError('Erreur lors de la soumission du stock. Veuillez vérifier vos informations et réessayer.');
         }
     };
 
@@ -79,6 +87,12 @@ export function StockModal({ isOpen, onClose, onSubmit }: AddStockModalProps) {
                     </button>
                 </div>
 
+                {error && (
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded mb-4">
+                        {error}
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-white mb-1">
@@ -86,8 +100,8 @@ export function StockModal({ isOpen, onClose, onSubmit }: AddStockModalProps) {
                         </label>
                         <input
                             type="text"
-                            name="product"
-                            value={formData.product}
+                            name="name"
+                            value={formData.name}
                             onChange={handleChange}
                             className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Nom du produit"
@@ -200,6 +214,21 @@ export function StockModal({ isOpen, onClose, onSubmit }: AddStockModalProps) {
                                 <span className="text-white text-sm">Générer automatiquement</span>
                             </div>
                         </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-white mb-1">
+                            Nom du Produit
+                        </label>
+                        <input
+                            type="text"
+                            name="product"
+                            value={formData.product}
+                            onChange={handleChange}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Nom du produit"
+                            required
+                        />
                     </div>
 
                     <button

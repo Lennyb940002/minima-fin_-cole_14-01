@@ -1,4 +1,3 @@
-//services/saleService.ts
 import { Sale } from '../models/Sale';
 
 export class SaleService {
@@ -19,7 +18,7 @@ export class SaleService {
                 paymentStatus: saleData.paymentStatus,
                 notes: saleData.notes || '',
                 date: saleData.date || new Date(),
-                margin: saleData.margin || (saleData.salePrice - saleData.unitCost) * saleData.quantity
+                margin: (saleData.salePrice - saleData.unitCost) * saleData.quantity
             });
 
             const savedSale = await sale.save();
@@ -32,14 +31,21 @@ export class SaleService {
     }
 
     static async update(id: string, saleData: any, userId: string) {
-        return await Sale.findOneAndUpdate(
-            { _id: id, userId },
-            {
-                ...saleData,
-                margin: (saleData.salePrice - saleData.unitCost) * saleData.quantity
-            },
-            { new: true }
-        );
+        try {
+            const updatedSale = await Sale.findOneAndUpdate(
+                { _id: id, userId },
+                {
+                    ...saleData,
+                    margin: (saleData.salePrice - saleData.unitCost) * saleData.quantity
+                },
+                { new: true }
+            );
+            console.log('Sale updated:', updatedSale);
+            return updatedSale;
+        } catch (error) {
+            console.error('Error in SaleService.update:', error);
+            throw error;
+        }
     }
 
     static async delete(id: string, userId: string) {

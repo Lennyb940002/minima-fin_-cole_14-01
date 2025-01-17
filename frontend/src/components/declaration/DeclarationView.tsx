@@ -12,95 +12,6 @@ interface DeclarationItem {
   payment: number;
 }
 
-const questions = [
-  {
-    question: 'Quel est votre régime fiscal ?',
-    options: ['12,5% (services)', '21,5% (activités commerciales)', '22,5% (activités artisanales)']
-  },
-  {
-    question: "Votre secteur d'activité principal ?",
-    options: [
-      'Vente de détail', 'Prestations artisanales', 'Services aux entreprises',
-      'Services aux particuliers', 'Profession libérale', 'Conseil et formation',
-      'Création et design', 'Autre'
-    ]
-  },
-  {
-    question: 'Votre mode de déclaration de revenus ?',
-    options: ['Mensuel', 'Trimestriel', 'Annuel']
-  },
-  {
-    question: "Votre tranche de chiffre d'affaires ?",
-    options: ['0-20 000€', '20 000-50 000€', '50 000-72 600€', 'Plus de 72 600€']
-  }
-];
-
-const Questionnaire: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<string[]>(new Array(questions.length).fill(''));
-
-  const handleOptionChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const newAnswers = [...answers];
-    newAnswers[index] = e.target.value;
-    setAnswers(newAnswers);
-  };
-
-  const handleNext = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    } else {
-      onComplete();
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black text-white">
-      <div className="max-w-xl w-full mx-4 p-8 rounded-2xl bg-gray-900 border border-gray-800">
-        <p className="text-3xl font-semibold mb-8 leading-tight text-center">
-          {questions[currentQuestionIndex].question}
-        </p>
-
-        <div className="space-y-4 mb-8">
-          {questions[currentQuestionIndex].options.map((option, index) => (
-            <label
-              key={option}
-              className="flex items-center p-4 rounded-lg border border-gray-800 cursor-pointer hover:bg-gray-800 transition-colors duration-200"
-            >
-              <input
-                type="radio"
-                name={`question-${currentQuestionIndex}`}
-                value={option}
-                checked={answers[currentQuestionIndex] === option}
-                onChange={(e) => handleOptionChange(e, currentQuestionIndex)}
-                className="hidden"
-              />
-              <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center
-                ${answers[currentQuestionIndex] === option
-                  ? 'border-blue-500 bg-blue-500'
-                  : 'border-gray-600'}`}
-              >
-                {answers[currentQuestionIndex] === option && (
-                  <div className="w-2 h-2 bg-white rounded-full" />
-                )}
-              </div>
-              <span className="text-lg">{option}</span>
-            </label>
-          ))}
-        </div>
-
-        <div className="flex justify-center">
-          <button
-            onClick={handleNext}
-            className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium text-lg"
-          >
-            {currentQuestionIndex < questions.length - 1 ? 'Suivant' : 'Soumettre'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function DeclarationView() {
   const [activeTab, setActiveTab] = useState<'monthly' | 'quarterly'>('monthly');
   const [nextDeclaration] = useState(52);
@@ -110,8 +21,6 @@ export function DeclarationView() {
   const [loading, setLoading] = useState(true);
   const [confirmationPopup, setConfirmationPopup] = useState(false);
   const [selectedDeclaration, setSelectedDeclaration] = useState<DeclarationItem | null>(null);
-  const [hasCompletedQuestionnaire, setHasCompletedQuestionnaire] = useState(false);
-  const [transitioning, setTransitioning] = useState(false);
 
   useEffect(() => {
     const fetchDeclarations = async () => {
@@ -182,23 +91,12 @@ export function DeclarationView() {
     setConfirmationPopup(false);
   };
 
-  const handleQuestionnaireComplete = () => {
-    setTransitioning(true);
-    setTimeout(() => {
-      setHasCompletedQuestionnaire(true);
-    }, 1000); // Correspond à la durée de la transition
-  };
-
-  if (!hasCompletedQuestionnaire) {
-    return <Questionnaire onComplete={handleQuestionnaireComplete} />;
-  }
-
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Chargement...</div>;
   }
 
   return (
-    <div className={`p-6 space-y-6 transition-opacity duration-1000 ${transitioning ? 'opacity-0' : 'opacity-100'}`}>
+    <div className="p-6 space-y-6">
       <div className="flex justify-between items-center border-b border-white/10 h-20">
         <div>
           <h1 className="text-2xl font-bold text-white">Mes Déclarations</h1>

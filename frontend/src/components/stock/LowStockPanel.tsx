@@ -1,7 +1,6 @@
-// components/stock/LowStockPanel.tsx
-import React from 'react';
-import { Trash2 } from 'lucide-react';
-import { LowStockItem } from './types';
+import React, { useState } from 'react';
+import { Trash2, AlertCircle, PackageOpen } from 'lucide-react';
+import { StockItem as LowStockItem } from './types';
 
 interface LowStockPanelProps {
     items: LowStockItem[];
@@ -9,37 +8,63 @@ interface LowStockPanelProps {
 }
 
 export function LowStockPanel({ items, onDelete }: LowStockPanelProps) {
+    const [deletingRefs, setDeletingRefs] = useState<string[]>([]);
+
+    const handleDelete = async (reference: string) => {
+        try {
+            setDeletingRefs(prev => [...prev, reference]);
+            await onDelete(reference);
+        } catch (error) {
+            console.error('Failed to delete item:', error);
+        } finally {
+            setDeletingRefs(prev => prev.filter(ref => ref !== reference));
+        }
+    };
+
     return (
-        <div className="bg-red-600/15 border border-red-600 rounded-xl p-6 h-[500px]">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-white">
+        <div className="bg-red-600/15 border border-red-600 rounded-xl p-6">
+            <div className="pb-3 border-b border-white/10">
+                <div className="flex items-center text-xl font-bold text-white">
+                    <AlertCircle className="w-5 h-5 mr-2" />
                     Stocks Critiques
                     <span className="ml-2 px-2 py-1 bg-red-600 rounded-full text-sm">
                         {items.length}
                     </span>
-                </h2>
+                </div>
             </div>
-            <div className="space-y-3">
-                {items.map((item) => (
-                    <div
-                        key={item.reference}
-                        className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10"
-                    >
-                        <div>
-                            <p className="text-white font-medium">{item.product}</p>
-                            <p className="text-gray-400 text-sm">
-                                {item.reference}
-                                <span className="ml-2">Stock: {item.quantity}</span>
-                            </p>
-                        </div>
-                        <button
-                            onClick={() => onDelete(item.reference)}
-                            className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded"
-                        >
-                            <Trash2 className="w-4 h-4" />
-                        </button>
+            <div className="mt-4 space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar">
+                {items.length === 0 ? (
+                    <div className="flex items-center gap-2 p-4 bg-white/5 border border-white/10 rounded-lg text-gray-400">
+                        <PackageOpen className="h-4 w-4" />
+                        <p>Aucun stock critique à afficher</p>
                     </div>
-                ))}
+                ) : (
+                    items.map((item) => (
+                        <div
+                            key={item.reference}
+                            className="group flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
+                        >
+                            <div>
+                                <p className="text-white font-medium flex items-center">
+                                    {item.product}
+                                </p>
+                                <div className="text-gray-400 text-sm space-x-2">
+                                    <span>Ref: {item.reference}</span>
+                                    <span className="inline-block px-2 py-0.5 bg-red-600/20 rounded">
+                                        Stock: {item.quantity}
+                                    </span>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => handleDelete(item.reference)}
+                                disabled={deletingRefs.includes(item.reference)}
+                                className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <Trash2 className={`w-4 h-4 ${deletingRefs.includes(item.reference) ? 'animate-spin' : ''}`} />
+                            </button>
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );

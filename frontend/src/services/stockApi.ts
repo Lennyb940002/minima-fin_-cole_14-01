@@ -1,4 +1,3 @@
-// services/stockApi.ts
 import axios from 'axios';
 import type { StockItem, StockAnalytics } from '../components/stock/types';
 
@@ -39,7 +38,7 @@ export const stockApi = {
                 unitPrice: item.price,
                 salePrice: item.price,
                 threshold: item.minQuantity,
-                lastUpdated: new Date(item.updatedAt)
+                lastUpdated: new Date(item.updatedAt),
             }));
         } catch (error) {
             console.error('Erreur lors de la récupération des stocks :', error);
@@ -49,14 +48,18 @@ export const stockApi = {
 
     createStock: async (stock: Omit<StockItem, 'id'>): Promise<StockItem> => {
         try {
-            console.log('Sending stock data:', stock);
+            // Ajoutez une vérification ici pour vous assurer que toutes les propriétés sont définies
+            if (!stock.product || !stock.reference || stock.quantity === undefined || stock.unitPrice === undefined || stock.salePrice === undefined || !stock.category || stock.threshold === undefined) {
+                throw new Error('Missing required fields');
+            }
+
             const response = await api.post('/stock', stock);
             return {
                 id: response.data._id,
                 ...stock,
                 createdAt: new Date(response.data.createdAt),
                 updatedAt: new Date(response.data.updatedAt),
-                lastUpdated: new Date(response.data.updatedAt)
+                lastUpdated: new Date(response.data.updatedAt),
             };
         } catch (error) {
             console.error('Erreur lors de la création du stock :', error);
@@ -72,8 +75,8 @@ export const stockApi = {
                 ...updateData,
                 createdAt: new Date(response.data.createdAt),
                 updatedAt: new Date(response.data.updatedAt),
-                lastUpdated: new Date(response.data.updatedAt)
-            };
+                lastUpdated: new Date(response.data.updatedAt),
+            } as StockItem;
         } catch (error) {
             console.error('Erreur lors de la mise à jour du stock :', error);
             throw error;
@@ -107,7 +110,7 @@ export const stockApi = {
                 unitPrice: item.price,
                 salePrice: item.price,
                 threshold: item.minQuantity,
-                lastUpdated: new Date(item.updatedAt)
+                lastUpdated: new Date(item.updatedAt),
             }));
         } catch (error) {
             console.error('Erreur lors de la récupération des stocks faibles :', error);
