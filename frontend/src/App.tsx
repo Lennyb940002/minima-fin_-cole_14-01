@@ -31,7 +31,7 @@ const MainContent = () => {
     <div
       className={`min-h-screen ${isSportPage ? 'bg-white text-black' : 'bg-black text-white'}`}
       style={{
-        transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out',
+        transition: 'background-color 0.1s ease-in-out, color 0.1s ease-in-out',
       }}
     >
       <Header />

@@ -1,4 +1,3 @@
-// Navigation.tsx
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 
@@ -12,7 +11,7 @@ export function Navigation() {
     return () => clearTimeout(timer);
   }, []);
 
-  const baseClass = `px-4 py-2 transition-all duration-300 rounded-[20px] ${isSportPage
+  const baseClass = `px-4 py-2 transition-all duration-300 ease-in-out rounded-[20px] ${isSportPage
     ? 'hover:bg-black hover:text-white hover:border hover:border-black'
     : 'hover:bg-white hover:text-black hover:border hover:border-white'
     }`;
@@ -36,19 +35,26 @@ export function Navigation() {
     { path: '/sceance-sport', label: 'Sceance de sport' },
   ];
 
+  const handleClick = (path: string) => {
+    if (path === '/ecommerce') {
+      window.location.href = 'http://localhost:5173/ecommerce';
+    }
+  };
+
   return (
     <nav className="flex gap-8">
       {navItems.map((item, index) => (
         <NavLink
           key={item.path}
           to={item.path}
+          onClick={() => handleClick(item.path)}
           className={({ isActive }) =>
             `${baseClass} ${isActive ? activeClass : inactiveClass}`
           }
           style={{
             opacity: isVisible ? 1 : 0,
             transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
-            transition: `opacity 0.2s ease-out ${0.2 * index}s, transform 0.2s ease-out ${0.2 * index}s`,
+            transition: `opacity 0.3s ease-out ${0.1 * index}s, transform 0.1s ease-out ${0.1 * index}s`,
           }}
         >
           {item.label}

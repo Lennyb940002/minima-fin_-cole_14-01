@@ -15,7 +15,7 @@ export function Link({ href, children, active }: LinkProps) {
     <RouterLink
       to={href}
       className={`
-        px-4 py-2 transition-all duration-300
+        px-4 py-2 transition-all duration-100 ease-in-out
         ${isSportPage
           ? `hover:bg-black hover:text-white hover:border hover:border-black
              ${active ? 'bg-black text-white border border-black' : 'text-black'}`
