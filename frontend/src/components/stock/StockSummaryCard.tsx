@@ -10,12 +10,12 @@ interface StockSummaryCardProps {
 
 export function StockSummaryCard({ title, value, icon }: StockSummaryCardProps) {
   return (
-    <div className="bg-black rounded-lg p-6 border border-white/10 text-center">
-      <div className="flex items-center text-center justify-between mb-2">
-        <h3 className="text-gray-300 text-sm text-center">{title}</h3>
-        {icon} {/* Affichage de l'icône */}
+    <div className="bg-black rounded-lg p-6 border border-white/10">
+      <div className="text-center mb-4">
+        <h3 className="text-lg font-medium text-white">{title}</h3>
+
       </div>
-      <p className="text-white text-2xl font-bold text-center ">{value}</p>
+      <p className="text-4xl font-bold text-white ">{value}</p>
     </div>
   );
 }
