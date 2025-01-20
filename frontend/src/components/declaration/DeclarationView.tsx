@@ -3,31 +3,28 @@ import { Link2 } from 'lucide-react';
 import { ChargesSimulator } from './ChargesSimulator';
 import DeclarationTabs from './DeclarationTabs';
 import { DeclarationSection } from './DeclarationSection';
-import { salesApi } from '../../services/api';
 import { declarationApi } from '../../services/declarationApi';
-
-interface DeclarationItem {
-  date: string;
-  amount: number;
-  payment: number;
-}
+import { Declaration } from './types';
 
 export function DeclarationView() {
   const [activeTab, setActiveTab] = useState<'monthly' | 'quarterly'>('monthly');
   const [nextDeclaration] = useState(52);
-  const [declarations, setDeclarations] = useState<DeclarationItem[]>([]);
-  const [paidDeclarations, setPaidDeclarations] = useState<DeclarationItem[]>([]);
-  const [historyDeclarations, setHistoryDeclarations] = useState<DeclarationItem[]>([]);
+  const [declarations, setDeclarations] = useState<Declaration[]>([]);
+  const [paidDeclarations, setPaidDeclarations] = useState<Declaration[]>([]);
+  const [historyDeclarations, setHistoryDeclarations] = useState<Declaration[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmationPopup, setConfirmationPopup] = useState(false);
-  const [selectedDeclaration, setSelectedDeclaration] = useState<DeclarationItem | null>(null);
+  const [selectedDeclaration, setSelectedDeclaration] = useState<Declaration | null>(null);
 
   useEffect(() => {
     const fetchDeclarations = async () => {
       try {
-        const salesData = await salesApi.getAllSales();
-        const transformedData = groupSalesByPeriod(salesData, activeTab);
-        setDeclarations(transformedData as DeclarationItem[]);
+        const declarationsData = await declarationApi.getAllDeclarations();
+        const paid = declarationsData.filter((d: Declaration) => d.isPaid);
+        const notPaid = declarationsData.filter((d: Declaration) => !d.isPaid);
+
+        setDeclarations([...new Map(notPaid.map(item => [item._id, item])).values()]);
+        setPaidDeclarations([...new Map(paid.map(item => [item._id, item])).values()]);
       } catch (error) {
         console.error('Error fetching declarations:', error);
       } finally {
@@ -36,53 +33,45 @@ export function DeclarationView() {
     };
 
     fetchDeclarations();
-  }, [activeTab]);
+  }, []);
 
-  const groupSalesByPeriod = (sales: any[], period: string): DeclarationItem[] => {
-    const groupedSales: { [key: string]: DeclarationItem } = {};
-
-    sales.forEach(sale => {
-      const date = new Date(sale.date);
-      let periodKey;
-
-      if (period === 'monthly') {
-        periodKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
-      } else {
-        const quarter = Math.floor(date.getMonth() / 3) + 1;
-        periodKey = `${date.getFullYear()}-Q${quarter}`;
-      }
-
-      if (!groupedSales[periodKey]) {
-        groupedSales[periodKey] = { date: periodKey, amount: 0, payment: 0 };
-      }
-
-      groupedSales[periodKey].amount += sale.salePrice * sale.quantity;
-      groupedSales[periodKey].payment += sale.salePrice * sale.quantity;
-    });
-
-    return Object.values(groupedSales);
+  const handleSimulate = (declaration: Declaration) => {
+    console.log('Total charges:', declaration.amount);
   };
 
-  const handleSimulate = (total: number) => {
-    console.log('Total charges:', total);
-  };
-
-  const handleDeclare = (declaration: DeclarationItem) => {
-    setSelectedDeclaration(declaration);
-    setConfirmationPopup(true);
+  const handleDeclare = (declaration: Declaration) => {
+    console.log('Declaration selected:', declaration);
+    if (declaration && declaration._id) {
+      setSelectedDeclaration(declaration);
+      setConfirmationPopup(true);
+    } else {
+      console.error('Invalid declaration:', declaration);
+    }
   };
 
   const confirmDeclare = async () => {
-    if (selectedDeclaration) {
+    if (selectedDeclaration && selectedDeclaration._id) {
+      console.log('Confirming declaration with ID:', selectedDeclaration._id);
       try {
-        await declarationApi.createDeclaration(selectedDeclaration);
-        setDeclarations(declarations.filter(decl => decl.date !== selectedDeclaration.date));
-        setPaidDeclarations([...paidDeclarations, selectedDeclaration]);
+        await declarationApi.updateDeclarationStatus(selectedDeclaration._id, true);
+
+        // Mettre à jour les déclarations après confirmation
+        setDeclarations(prevDeclarations => prevDeclarations.filter(decl => decl._id !== selectedDeclaration._id));
+
+        // Ajouter uniquement si l'ID n'existe pas déjà dans paidDeclarations
+        setPaidDeclarations(prevPaidDeclarations => {
+          const updatedPaidDeclarations = new Map(prevPaidDeclarations.map(item => [item._id, item]));
+          updatedPaidDeclarations.set(selectedDeclaration._id, { ...selectedDeclaration, isPaid: true });
+          return [...updatedPaidDeclarations.values()];
+        });
+
         setSelectedDeclaration(null);
         setConfirmationPopup(false);
       } catch (error) {
         console.error('Error declaring:', error);
       }
+    } else {
+      console.error('Selected declaration is null or has an undefined ID');
     }
   };
 
@@ -115,7 +104,7 @@ export function DeclarationView() {
         <div className="relative pr-6">
           <DeclarationSection
             title="À Déclarer"
-            items={declarations}
+            items={declarations.filter(decl => !paidDeclarations.some(paidDecl => paidDecl._id === decl._id))}
             onDeclare={handleDeclare}
             onSimulate={handleSimulate}
             period={activeTab}

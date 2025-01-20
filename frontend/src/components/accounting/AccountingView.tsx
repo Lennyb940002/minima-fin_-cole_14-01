@@ -5,6 +5,7 @@ import FinancialChart from './FinancialChart';
 import { Transaction, FinancialSummary } from './types';
 import { salesApi } from '../../services/api';
 import { stockApi } from '../../services/stockApi';
+import { declarationApi } from '../../services/declarationApi';
 
 export function AccountingView() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -47,19 +48,42 @@ export function AccountingView() {
     }
   };
 
+  const fetchDeclarationsData = async () => {
+    try {
+      const declarationsData = await declarationApi.getAllDeclarations();
+      const paidDeclarations = declarationsData.filter((declaration: any) => declaration.isPaid);
+      const declarationTransactions: Transaction[] = paidDeclarations.map((declaration: any) => {
+        const reducedAmount = declaration.amount * 0.123; // Apply 12.3% to the amount
+        return {
+          id: declaration._id,
+          date: declaration.date,
+          category: 'Declarations',
+          description: 'Charges payées',
+          amount: reducedAmount,
+          type: 'expense' as const,
+        };
+      });
+      return declarationTransactions;
+    } catch (error) {
+      console.error('Erreur lors de la récupération des déclarations:', error);
+      return [];
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       const salesTransactions = await fetchSalesData();
       const stockTransactions = await fetchStockData();
+      const declarationTransactions = await fetchDeclarationsData();
 
       // Combine transactions
-      const allTransactions = [...salesTransactions, ...stockTransactions];
+      const allTransactions = [...salesTransactions, ...stockTransactions, ...declarationTransactions];
       setTransactions(allTransactions);
 
       // Calculate summary
       const revenue = salesTransactions.reduce((acc, trans) => acc + trans.amount, 0);
-      const expenses = stockTransactions.reduce((acc, trans) => acc + trans.amount, 0);
+      const expenses = [...stockTransactions, ...declarationTransactions].reduce((acc, trans) => acc + trans.amount, 0);
       const profit = revenue - expenses;
 
       setSummary({ revenue, expenses, profit });

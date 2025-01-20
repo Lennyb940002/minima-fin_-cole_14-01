@@ -5,7 +5,14 @@ export interface Declaration {
   status: 'pending' | 'paid' | 'processing';
   paymentDate?: string;
   lastModified: string;
-  // autres champs...
+  type: string;
+  dueDate: string;
+  amount: number;
+  submissionDate?: string;
+  isPaid: boolean;
+  // Ajout des champs manquants
+  date: string;
+  payment: number;
 }
 
 export class DeclarationError extends Error {

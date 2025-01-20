@@ -1,3 +1,4 @@
+// src/components/declaration/DeclarationList.tsx
 import React from 'react';
 import { Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Declaration } from './types';
