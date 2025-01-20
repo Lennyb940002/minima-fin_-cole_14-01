@@ -1,8 +1,7 @@
 import React from 'react';
-import { Pencil, Trash } from 'lucide-react';
+import { Pencil, Trash, Link as LinkIcon } from 'lucide-react';
 import { Product } from './types';
 
-// Ajouter la fonction getLogoUrl en haut du fichier
 const getLogoUrl = (category: string): string => {
     switch (category) {
         case 'tech': return 'https://img.icons8.com/?size=100&id=1581&format=png&color=000000';
@@ -36,65 +35,73 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onEdit, onDel
 
     const logoUrl = getLogoUrl(product.category);
 
-    const getStatusClass = (status: string) => {
+    const getStatusStyle = (status: string) => {
+        const baseStyle = "text-xs font-medium";
         switch (status) {
             case 'validated':
-                return 'bg-green-100 text-green-700';
+                return `${baseStyle} text-green-600`;
             case 'in-progress':
-                return 'bg-yellow-100 text-yellow-700';
+                return `${baseStyle} text-amber-600`;
             case 'rejected':
-                return 'bg-red-100 text-red-700';
+                return `${baseStyle} text-red-600`;
             default:
-                return 'bg-gray-100 text-gray-700';
+                return `${baseStyle} text-gray-600`;
         }
     };
 
     const getStatusText = (status: string) => {
         switch (status) {
-            case 'validated':
-                return 'Validé';
-            case 'in-progress':
-                return 'En cours';
-            case 'rejected':
-                return 'Rejeté';
-            default:
-                return 'Inconnu';
+            case 'validated': return 'Validé';
+            case 'in-progress': return 'En cours';
+            case 'rejected': return 'Rejeté';
+            default: return 'Inconnu';
         }
     };
 
     return (
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-            <div className="flex justify-center mb-4">
+        <div className="group bg-white hover:shadow-md transition-shadow duration-200 rounded-lg p-6 relative">
+            {/* Logo et Catégorie */}
+            <div className="flex items-center gap-3 mb-4">
                 {logoUrl && (
-                    <img src={logoUrl} alt={product.category} className="h-16 mt-8 mb-16" />
+                    <img src={logoUrl} alt={product.category} className="h-8 w-8" />
                 )}
+                <span className="text-sm text-gray-600">{product.category}</span>
             </div>
-            <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-medium text-black">{product.name}</h3>
-                <div className="flex gap-2">
-                    <button
-                        onClick={() => onEdit(productId)}
-                        className="p-1.5 text-black hover:text-gray-700 hover:bg-gray-100 rounded"
-                    >
-                        <Pencil className="w-4 h-4" />
-                    </button>
-                    <button
-                        onClick={() => onDelete(productId)}
-                        className="p-1.5 text-black hover:text-gray-700 hover:bg-gray-100 rounded"
-                    >
-                        <Trash className="w-4 h-4" />
-                    </button>
-                </div>
+
+            {/* Actions (visibles au hover) */}
+            <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                    onClick={() => onEdit(productId)}
+                    className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full"
+                >
+                    <Pencil className="w-4 h-4" />
+                </button>
+                <button
+                    onClick={() => onDelete(productId)}
+                    className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full"
+                >
+                    <Trash className="w-4 h-4" />
+                </button>
             </div>
-            <p className="text-black text-sm mb-0">{product.description}</p>
-            <a href={product.link} className="text-blue-500 text-sm mb-0" target="_blank" rel="noopener noreferrer">
-                Lien🔗
-            </a>
-            <div className="flex justify-between items-center mt-3">
-                <span className={`px-2 py-1 rounded-full text-xs ${getStatusClass(product.status)}`}>
+
+            {/* Contenu principal */}
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{product.name}</h3>
+            <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.description}</p>
+
+            {/* Footer */}
+            <div className="flex justify-between items-center">
+                <span className={getStatusStyle(product.status)}>
                     {getStatusText(product.status)}
                 </span>
-                <span className="text-black text-sm">{product.category}</span>
+                <a
+                    href={product.link}
+                    className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <LinkIcon className="w-4 h-4" />
+                    Voir
+                </a>
             </div>
         </div>
     );
