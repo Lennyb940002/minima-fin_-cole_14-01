@@ -8,6 +8,7 @@ import { stockRouter } from './routes/stockRoutes';
 import { saleRouter } from './routes/saleRoutes';
 import { productRouter } from './routes/productRoutes';
 import { declarationRouter } from './routes/declarationRoutes'; // Importer le routeur des déclarations
+import { marketingRouter } from './routes/marketingRoutes';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use('/api/stock', stockRouter);
 app.use('/api/sales', saleRouter);
 app.use('/api/products', productRouter);
 app.use('/api/declarations', declarationRouter); // Utiliser le routeur des déclarations
+app.use('/api/marketing', marketingRouter);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pencil, Trash, Calendar, DollarSign, Clock, Target } from 'lucide-react';
+import { Pencil, Trash, Calendar, DollarSign, Clock, Target, Users, Tag, Video, FileText } from 'lucide-react';
 
 interface MarketingCampaignCardProps {
     campaign: any;
@@ -7,113 +7,143 @@ interface MarketingCampaignCardProps {
     onDelete: (id: string) => void;
 }
 
-const platformStyles: { [key: string]: string } = {
-    insta: 'bg-black border-pink-500',
-    tiktok: 'bg-black border-purple-500',
-    facebook: 'bg-black border-blue-600',
-    youtube: 'bg-black border-red-600',
-    twitter: 'bg-black border-gray-600',
+const platformConfig = {
+    insta: {
+        borderColor: 'border-white/10 hover:border-white/20',
+        icon: '📸',
+        name: 'Instagram'
+    },
+    tiktok: {
+        borderColor: 'border-white/10 hover:border-white/20',
+        icon: '🎵',
+        name: 'TikTok'
+    },
+    facebook: {
+        borderColor: 'border-white/10 hover:border-white/20',
+        icon: '👥',
+        name: 'Facebook'
+    },
+    youtube: {
+        borderColor: 'border-white/10 hover:border-white/20',
+        icon: '▶️',
+        name: 'YouTube'
+    },
+    twitter: {
+        borderColor: 'border-white/10 hover:border-white/20',
+        icon: '🐦',
+        name: 'Twitter'
+    }
 };
 
-const platformNames: { [key: string]: string } = {
-    insta: 'Instagram',
-    tiktok: 'TikTok',
-    facebook: 'Facebook',
-    youtube: 'YouTube',
-    twitter: 'Twitter',
+const campaignTypeConfig = {
+    reel: {
+        icon: <Video className="w-4 h-4" />,
+        label: 'Reel'
+    },
+    post: {
+        icon: <FileText className="w-4 h-4" />,
+        label: 'Post'
+    },
+    campaign: {
+        icon: <Target className="w-4 h-4" />,
+        label: 'Campagne'
+    }
 };
 
 export const MarketingCampaignCard: React.FC<MarketingCampaignCardProps> = ({ campaign, onEdit, onDelete }) => {
-    const campaignId = campaign.id ? campaign.id.toString() : campaign._id?.toString();
-
+    const campaignId = campaign.id?.toString() || campaign._id?.toString();
     if (!campaignId) {
         console.error("Campaign ID is undefined", campaign);
         return null;
     }
 
-    const platformStyle = platformStyles[campaign.platform];
-    const platformName = platformNames[campaign.platform];
+    const platform = platformConfig[campaign.platform] || platformConfig.facebook;
+    const campaignType = campaignTypeConfig[campaign.type] || campaignTypeConfig.post;
+
+    const formatDate = (date: string) => {
+        try {
+            return new Date(date).toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'short'
+            });
+        } catch {
+            return date;
+        }
+    };
 
     return (
-        <div
-            className={`relative flex flex-col rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ${platformStyle} border overflow-hidden`}
-            style={{ height: '500px', width: '100%', maxWidth: '400px' }}
-        >
-            {/* En-tête */}
-            <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent z-10" />
+        <div className={`relative rounded-xl bg-black/50 backdrop-blur-sm border ${platform.borderColor} transition-all duration-300`}
+            style={{ minHeight: '420px', maxHeight: '500px', width: '100%', maxWidth: '400px' }}>
 
-            {/* Header Content */}
-            <div className="relative z-20 p-6">
-                <div className="flex justify-between items-start">
-                    {/* Platform Badge */}
-                    <span className="px-3 py-1.5 bg-black/40 backdrop-blur-sm text-sm font-medium text-white rounded-lg border border-white/10">
-                        {platformName}
-                    </span>
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => onEdit(campaignId)}
-                            className="p-2 text-white/80 hover:text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-lg border border-white/10 transition-all"
-                        >
+            {/* Header */}
+            <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                    <div className="space-y-2">
+                        <div className="flex gap-2">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 rounded-md text-sm">
+                                <span>{platform.icon}</span>
+                                {platform.name}
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 border border-white/10 rounded-md text-sm text-white/60">
+                                {campaignType.icon}
+                                {campaignType.label}
+                            </span>
+                        </div>
+                        <h3 className="text-lg font-medium text-white">{campaign.name}</h3>
+                    </div>
+                    <div className="flex gap-1">
+                        <button onClick={() => onEdit(campaignId)}
+                            className="p-2 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors">
                             <Pencil className="w-4 h-4" />
                         </button>
-                        <button
-                            onClick={() => onDelete(campaignId)}
-                            className="p-2 text-white/80 hover:text-white bg-black/40 hover:bg-red-600/60 backdrop-blur-sm rounded-lg border border-white/10 transition-all"
-                        >
+                        <button onClick={() => onDelete(campaignId)}
+                            className="p-2 text-white/60 hover:text-red-400 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors">
                             <Trash className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
-
-                {/* Campaign Title */}
-                <h3 className="text-xl font-semibold text-white mt-4 mb-2">{campaign.name}</h3>
             </div>
 
-            {/* Main Content */}
-            <div className="flex-1 p-6 pt-0 overflow-y-auto">
-                {/* Description */}
-                <div className="space-y-4">
-                    <div className="text-white/90">
-                        <p className="line-clamp-3">
-                            {campaign.type === 'reel' ? campaign.script : campaign.content}
-                        </p>
+            {/* Content */}
+            <div className="px-6 pb-6 space-y-4">
+                <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
+                    <p className="text-white/80 line-clamp-3">
+                        {campaign.type === 'reel' ? campaign.script : campaign.content}
+                    </p>
+                </div>
+
+                {campaign.hashtags && (
+                    <div className="flex gap-2 items-start p-4 bg-white/5 border border-white/10 rounded-lg">
+                        <Tag className="w-4 h-4 text-white/40 mt-1" />
+                        <p className="text-white/60 line-clamp-2 flex-1">{campaign.hashtags}</p>
                     </div>
+                )}
 
-                    {/* Hashtags */}
-                    {campaign.hashtags && (
-                        <div className="pb-4 border-b border-white/10">
-                            <p className="text-blue-400/90 line-clamp-2">{campaign.hashtags}</p>
-                        </div>
-                    )}
-
-                    {/* Campaign Info */}
+                <div className="grid grid-cols-2 gap-3">
                     {campaign.isAd && (
-                        <div className="grid grid-cols-2 gap-4 text-sm text-white/80">
-                            <div className="flex items-center gap-2">
-                                <DollarSign className="w-4 h-4" />
-                                <span>{campaign.adBudget}€</span>
+                        <>
+                            <div className="flex items-center gap-2 p-3 bg-white/5 border border-white/10 rounded-lg">
+                                <DollarSign className="w-4 h-4 text-white/40" />
+                                <span className="text-white/80">{campaign.adBudget}€</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4" />
-                                <span>{campaign.adDuration}</span>
+                            <div className="flex items-center gap-2 p-3 bg-white/5 border border-white/10 rounded-lg">
+                                <Clock className="w-4 h-4 text-white/40" />
+                                <span className="text-white/80">{campaign.adDuration}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4" />
-                                <span>{campaign.postDate}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4" />
-                                <span>{campaign.postTime}</span>
-                            </div>
-                        </div>
+                        </>
                     )}
-
+                    <div className="flex items-center gap-2 p-3 bg-white/5 border border-white/10 rounded-lg">
+                        <Calendar className="w-4 h-4 text-white/40" />
+                        <span className="text-white/80">{formatDate(campaign.postDate)}</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-3 bg-white/5 border border-white/10 rounded-lg">
+                        <Clock className="w-4 h-4 text-white/40" />
+                        <span className="text-white/80">{campaign.postTime}</span>
+                    </div>
                     {campaign.type === 'campaign' && (
-                        <div className="flex items-center gap-2 text-white/80">
-                            <Target className="w-4 h-4" />
-                            <span>{campaign.objective}</span>
+                        <div className="flex items-center gap-2 p-3 bg-white/5 border border-white/10 rounded-lg col-span-2">
+                            <Users className="w-4 h-4 text-white/40" />
+                            <span className="text-white/80">{campaign.objective}</span>
                         </div>
                     )}
                 </div>
@@ -121,12 +151,12 @@ export const MarketingCampaignCard: React.FC<MarketingCampaignCardProps> = ({ ca
 
             {/* Footer */}
             {campaign.isAd && (
-                <div className="p-6 pt-0 border-t border-white/10 bg-black/20">
+                <div className="px-6 pb-6">
                     <div className="flex gap-3">
-                        <button className="flex-1 py-2 px-4 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors">
+                        <button className="flex-1 py-2 px-4 bg-white/10 hover:bg-white/20 text-white border border-white/10 rounded-lg transition-colors">
                             Terminer
                         </button>
-                        <button className="flex-1 py-2 px-4 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium rounded-lg transition-colors">
+                        <button className="flex-1 py-2 px-4 bg-white/5 hover:bg-white/10 text-white/80 border border-white/10 rounded-lg transition-colors">
                             Prolonger
                         </button>
                     </div>
