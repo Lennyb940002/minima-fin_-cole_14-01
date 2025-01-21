@@ -1,8 +1,9 @@
-// types.ts
+export type TransactionCategory = 'Sales' | 'Stock' | 'Marketing' | 'Declarations';
+
 export interface Transaction {
-  id: any;
-  date: any;
-  category: string;
+  id: string;
+  date: string; // Use `Date` if you prefer working with Date objects.
+  category: TransactionCategory;
   description: string;
   amount: number;
   type: 'income' | 'expense';

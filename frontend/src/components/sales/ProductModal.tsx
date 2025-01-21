@@ -79,108 +79,128 @@ export function ProductModal({ isOpen, onClose, onSubmit }: ProductModalProps) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white/10 backdrop-blur-lg border border-white/10 p-8 rounded-xl shadow-2xl max-w-2xl w-full">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-semibold text-white">Nouvelle Vente</h2>
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+            {/* Overlay avec effet de flou */}
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+
+            {/* Modal */}
+            <div className="relative w-full max-w-2xl bg-black bg-opacity-50 rounded-2xl shadow-2xl p-8 border border-white/10 m-4">
+                {/* En-tête */}
+                <div className="flex justify-between items-start mb-8">
+                    <div className="space-y-1">
+                        <h2 className="text-2xl font-semibold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                            Nouvelle Vente
+                        </h2>
+                    </div>
                     <button
                         onClick={onClose}
-                        className="text-white hover:text-gray-300 transition"
+                        className="group p-2 hover:bg-white/10 rounded-full transition-colors"
                         aria-label="Fermer"
                     >
-                        <X size={24} />
+                        <X className="w-5 h-5 text-white/60 group-hover:text-white" />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-white mb-1">
-                            Produit
-                        </label>
-                        <input
-                            type="text"
-                            name="product"
-                            required
-                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.product}
-                            onChange={handleChange}
-                            placeholder="Nom du produit"
-                        />
+                {/* Messages d'état */}
+                {error && (
+                    <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400">
+                        <p className="flex items-center gap-2">
+                            <span className="inline-block w-2 h-2 rounded-full bg-red-500" />
+                            {error}
+                        </p>
                     </div>
+                )}
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
-                                Quantité
-                            </label>
+                {/* Formulaire */}
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-4">
+                        <div className="relative">
                             <input
-                                type="number"
-                                name="quantity"
+                                type="text"
+                                name="product"
                                 required
-                                min="1"
-                                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                value={formData.quantity}
+                                className="w-full bg-white/10 border border-white/10 rounded-xl p-4 pl-4 text-white text-lg"
+                                value={formData.product}
                                 onChange={handleChange}
-                                placeholder="1"
+                                placeholder="Nom du produit"
                             />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
-                                Prix de vente
-                            </label>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-sm font-medium text-white">Quantité</label>
+                                <input
+                                    type="number"
+                                    name="quantity"
+                                    required
+                                    min="1"
+                                    className="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-white"
+                                    value={formData.quantity}
+                                    onChange={handleChange}
+                                    placeholder="1"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-white">Prix de vente</label>
+                                <input
+                                    type="number"
+                                    name="salePrice"
+                                    required
+                                    min="0"
+                                    step="0.01"
+                                    className="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-white"
+                                    value={formData.salePrice}
+                                    onChange={handleChange}
+                                    placeholder="0.00"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-white">Coût unitaire</label>
                             <input
                                 type="number"
-                                name="salePrice"
+                                name="unitCost"
                                 required
                                 min="0"
                                 step="0.01"
-                                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                value={formData.salePrice}
+                                className="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-white"
+                                value={formData.unitCost}
                                 onChange={handleChange}
                                 placeholder="0.00"
                             />
                         </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-white">Statut du paiement</label>
+                            <select
+                                name="paymentStatus"
+                                className="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-white"
+                                value={formData.paymentStatus}
+                                onChange={handleChange}
+                            >
+                                <option className="text-black" value="En attente">En attente</option>
+                                <option className="text-black" value="Effectué">Effectué</option>
+                                <option className="text-black" value="Annulé">Annulé</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                            Coût unitaire
-                        </label>
-                        <input
-                            type="number"
-                            name="unitCost"
-                            required
-                            min="0"
-                            step="0.01"
-                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.unitCost}
-                            onChange={handleChange}
-                            placeholder="0.00"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                            Statut du paiement
-                        </label>
-                        <select
-                            name="paymentStatus"
-                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={formData.paymentStatus}
-                            onChange={handleChange}
+                    <div className="flex gap-3">
+                        <button
+                            type="button"
+                            className="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl transition"
+                            onClick={onClose}
                         >
-                            <option className="text-black" value="En attente">En attente</option>
-                            <option className="text-black" value="Effectué">Effectué</option>
-                            <option className="text-black" value="Annulé">Annulé</option>
-                        </select>
+                            Annuler
+                        </button>
+                        <button
+                            type="submit"
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition"
+                        >
+                            Ajouter la vente
+                        </button>
                     </div>
-
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition duration-300 ease-in-out transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                    >
-                        Ajouter la vente
-                    </button>
                 </form>
             </div>
         </div>

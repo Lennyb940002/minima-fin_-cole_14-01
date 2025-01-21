@@ -33,7 +33,6 @@ export function StockModal({ isOpen, onClose, onSubmit }: AddStockModalProps) {
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
         const { name, value, type } = e.target;
-        console.log(`handleChange - ${name}: ${value}`);
         setFormData(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
@@ -74,169 +73,175 @@ export function StockModal({ isOpen, onClose, onSubmit }: AddStockModalProps) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white/10 backdrop-blur-lg border border-white/10 p-8 rounded-xl shadow-2xl max-w-2xl w-full">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-semibold text-white">Ajouter un Produit</h2>
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+            {/* Overlay avec effet de flou */}
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+
+            {/* Modal */}
+            <div className="relative w-full max-w-2xl bg-black rounded-2xl shadow-2xl p-8 border border-white/10 m-4">
+                {/* En-tête */}
+                <div className="flex justify-between items-start mb-8">
+                    <div className="space-y-1">
+                        <h2 className="text-2xl font-semibold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                            Ajouter un Produit
+                        </h2>
+                    </div>
                     <button
                         onClick={onClose}
-                        className="text-white hover:text-gray-300 transition"
+                        className="group p-2 hover:bg-white/10 rounded-full transition-colors"
                         aria-label="Fermer"
                     >
-                        <X size={24} />
+                        <X className="w-5 h-5 text-white/60 group-hover:text-white" />
                     </button>
                 </div>
 
+                {/* Messages d'état */}
                 {error && (
-                    <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded mb-4">
-                        {error}
+                    <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400">
+                        <p className="flex items-center gap-2">
+                            <span className="inline-block w-2 h-2 rounded-full bg-red-500" />
+                            {error}
+                        </p>
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-white mb-1">
-                            Nom du Produit
-                        </label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Nom du produit"
-                            required
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-white mb-1">
-                                Quantité
-                            </label>
-                            <input
-                                type="number"
-                                name="quantity"
-                                value={formData.quantity}
-                                onChange={handleChange}
-                                min="1"
-                                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-white mb-1">
-                                Prix Unitaire
-                            </label>
-                            <input
-                                type="number"
-                                name="unitPrice"
-                                value={formData.unitPrice}
-                                onChange={handleChange}
-                                min="0"
-                                step="0.01"
-                                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-white mb-1">
-                                Prix de Vente
-                            </label>
-                            <input
-                                type="number"
-                                name="salePrice"
-                                value={formData.salePrice}
-                                onChange={handleChange}
-                                min="0"
-                                step="0.01"
-                                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-white mb-1">
-                                Seuil d'Alerte
-                            </label>
-                            <input
-                                type="number"
-                                name="threshold"
-                                value={formData.threshold}
-                                onChange={handleChange}
-                                min="0"
-                                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-white mb-1">
-                            Catégorie
-                        </label>
-                        <input
-                            type="text"
-                            name="category"
-                            value={formData.category}
-                            onChange={handleChange}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Catégorie"
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-white mb-1">
-                            Référence du Produit
-                        </label>
-                        <div className="flex items-center space-x-4">
+                {/* Formulaire */}
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-4">
+                        <div className="relative">
                             <input
                                 type="text"
-                                name="reference"
-                                value={formData.reference}
+                                name="name"
+                                value={formData.name}
                                 onChange={handleChange}
-                                disabled={formData.autoGenerateReference}
-                                className={`w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${formData.autoGenerateReference ? 'opacity-50 cursor-not-allowed' : ''
-                                    }`}
-                                placeholder="Référence personnalisée"
+                                className="w-full bg-white/10 border border-white/10 rounded-xl p-4 pl-4 text-white text-lg"
+                                placeholder="Nom du produit"
+                                required
                             />
-                            <div className="flex items-center space-x-2">
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-sm font-medium text-white">Quantité</label>
                                 <input
-                                    type="checkbox"
-                                    name="autoGenerateReference"
-                                    checked={formData.autoGenerateReference}
+                                    type="number"
+                                    name="quantity"
+                                    value={formData.quantity}
                                     onChange={handleChange}
-                                    className="form-checkbox text-blue-600 bg-white/5 border border-white/10 focus:ring-2 focus:ring-blue-500"
+                                    min="1"
+                                    className="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-white"
+                                    required
                                 />
-                                <span className="text-white text-sm">Générer automatiquement</span>
                             </div>
+                            <div>
+                                <label className="text-sm font-medium text-white">Prix Unitaire</label>
+                                <input
+                                    type="number"
+                                    name="unitPrice"
+                                    value={formData.unitPrice}
+                                    onChange={handleChange}
+                                    min="0"
+                                    step="0.01"
+                                    className="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-white"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-sm font-medium text-white">Prix de Vente</label>
+                                <input
+                                    type="number"
+                                    name="salePrice"
+                                    value={formData.salePrice}
+                                    onChange={handleChange}
+                                    min="0"
+                                    step="0.01"
+                                    className="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-white"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-white">Seuil d'Alerte</label>
+                                <input
+                                    type="number"
+                                    name="threshold"
+                                    value={formData.threshold}
+                                    onChange={handleChange}
+                                    min="0"
+                                    className="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-white"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-white">Catégorie</label>
+                            <input
+                                type="text"
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                                className="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-white"
+                                placeholder="Catégorie"
+                                required
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-white">Référence du Produit</label>
+                            <div className="flex items-center space-x-4">
+                                <input
+                                    type="text"
+                                    name="reference"
+                                    value={formData.reference}
+                                    onChange={handleChange}
+                                    disabled={formData.autoGenerateReference}
+                                    className={`w-full bg-white/10 border border-white/10 rounded-xl p-4 text-white ${formData.autoGenerateReference ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    placeholder="Référence personnalisée"
+                                />
+                                <div className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        name="autoGenerateReference"
+                                        checked={formData.autoGenerateReference}
+                                        onChange={handleChange}
+                                        className="form-checkbox text-blue-600 bg-white/5 border border-white/10 focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    <span className="text-white text-sm">Générer automatiquement</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-white">Description</label>
+                            <textarea
+                                name="description"
+                                value={formData.description}
+                                onChange={handleChange}
+                                className="w-full bg-white/10 border border-white/10 rounded-xl p-4 text-white"
+                                rows={4}
+                                placeholder="Description du produit"
+                            />
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-white mb-1">
-                            Nom du Produit
-                        </label>
-                        <input
-                            type="text"
-                            name="product"
-                            value={formData.product}
-                            onChange={handleChange}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Nom du produit"
-                            required
-                        />
+                    <div className="flex gap-3">
+                        <button
+                            type="button"
+                            className="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl transition"
+                            onClick={onClose}
+                        >
+                            Annuler
+                        </button>
+                        <button
+                            type="submit"
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition"
+                        >
+                            Ajouter au Stock
+                        </button>
                     </div>
-
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition duration-300 ease-in-out transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                    >
-                        Ajouter au Stock
-                    </button>
                 </form>
             </div>
         </div>

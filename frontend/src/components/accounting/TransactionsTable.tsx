@@ -88,6 +88,9 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
   const groupedTransactions = groupByMonth(transactions);
   const sortedTransactions = groupedTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
+  console.log('Transactions:', transactions);
+  console.log('Grouped Transactions:', groupedTransactions);
+
   return (
     <div className="bg-black rounded-lg border border-white/10 overflow-hidden">
       <table className="w-full">
@@ -102,7 +105,7 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
         </thead>
         <tbody>
           {sortedTransactions.map((transaction) => (
-            <tr key={transaction.id || transaction.date} className="border-b border-white/10">
+            <tr key={transaction.id} className="border-b border-white/10">
               <td className="px-4 py-3 text-sm text-white">{new Date(transaction.date).toLocaleDateString()}</td>
               <td className="px-4 py-3 text-sm text-white">
                 <span className={`inline-block w-3 h-3 rounded-full mr-2 ${getBadgeColor(transaction.category)}`}></span>
