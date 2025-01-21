@@ -6,40 +6,21 @@ interface TransactionsTableProps {
   transactions: Transaction[];
 }
 
-const getBadgeColor = (category: string) => {
-  switch (category) {
-    case 'Sales': return 'bg-green-500';
-    case 'Stock': return 'bg-orange-500';
-    case 'Marketing': return 'bg-purple-500';
-    case 'Declarations': return 'bg-purple-500'; // Changed to violet
-    default: return 'bg-gray-500';
-  }
-};
-
 const getColorScheme = (type: 'income' | 'expense', category: string) => {
-  if (type === 'income') {
-    switch (category) {
-      case 'Sales': return 'bg-green-500/20 text-green-400';
-      case 'Stock': return 'bg-orange-500/20 text-orange-400';
-      case 'Marketing': return 'bg-purple-500/20 text-purple-400';
-      case 'Declarations': return 'bg-purple-500/20 text-purple-400'; // Changed to violet
-      default: return 'bg-gray-500/20 text-gray-400';
-    }
-  } else {
-    switch (category) {
-      case 'Stock': return 'bg-orange-500/20 text-orange-400';
-      case 'Declarations': return 'bg-purple-500/20 text-purple-400'; // Changed to violet
-      case 'Marketing': return 'bg-purple-500/20 text-purple-400';
-      default: return 'bg-gray-500/20 text-gray-400';
-    }
+  switch (category) {
+    case 'Sales': return 'bg-green-500/20 text-green-400';
+    case 'Stock': return 'bg-blue-500/20 text-blue-400';
+    case 'Marketing': return 'bg-purple-500/20 text-purple-400';
+    case 'Declarations': return 'bg-red-500/20 text-red-400';
+    default: return 'bg-gray-500/20 text-gray-400';
   }
 };
 
 const getTextColor = (type: 'income' | 'expense', category: string) => {
   if (type === 'income') return 'text-green-500';
   switch (category) {
-    case 'Stock': return 'text-orange-500';
-    case 'Declarations': return 'text-purple-500'; // Changed to violet
+    case 'Stock': return 'text-blue-500';
+    case 'Declarations': return 'text-red-500';
     case 'Marketing': return 'text-purple-500';
     default: return 'text-gray-500';
   }
@@ -92,7 +73,7 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
   console.log('Grouped Transactions:', groupedTransactions);
 
   return (
-    <div className="bg-black rounded-lg border border-white/10 overflow-hidden">
+    <div className="bg-black rounded-lg border border-white/10 overflow-hidden mx-auto my-4">
       <table className="w-full">
         <thead>
           <tr className="border-b border-white/10">
@@ -108,18 +89,23 @@ export function TransactionsTable({ transactions }: TransactionsTableProps) {
             <tr key={transaction.id} className="border-b border-white/10">
               <td className="px-4 py-3 text-sm text-white">{new Date(transaction.date).toLocaleDateString()}</td>
               <td className="px-4 py-3 text-sm text-white">
-                <span className={`inline-block w-3 h-3 rounded-full mr-2 ${getBadgeColor(transaction.category)}`}></span>
-                {transaction.category}
-              </td>
-              <td className="px-4 py-3 text-sm text-white">
-                <span className={`px-2 py-1 rounded-full text-xs ${getColorScheme(transaction.type, transaction.category)}`}>
-                  {transaction.description || 'No Description'}
+                <span className={`px-2 py-1 rounded-full text-sm ${getColorScheme(transaction.type, transaction.category)}`}>
+                  {transaction.category}
                 </span>
               </td>
               <td className="px-4 py-3 text-sm text-white">
+                <span className={`px-2 py-1 rounded-full text-xs ${(transaction.type, transaction.category)}`}>
+                  {transaction.description || 'No Description'}
+                </span>
+              </td>
+              <td
+                className={`px-2 py-1 rounded-full text-xs text-white`}
+              >
                 {transaction.type === 'income' ? 'Rentrée d\'argent' : 'Dépense'}
               </td>
-              <td className={`px-4 py-3 text-sm text-right ${getTextColor(transaction.type, transaction.category)}`}>
+              <td
+                className={`px-2 py-1 rounded-full text-xs text-right ${transaction.type === 'income' ? 'text-rgb(28, 230, 28)' : 'text-rgb(241, 18, 2)'}`}
+              >
                 {transaction.type === 'expense' ? '- ' : '+ '}
                 {formatCurrency(transaction.amount || 0)}
               </td>

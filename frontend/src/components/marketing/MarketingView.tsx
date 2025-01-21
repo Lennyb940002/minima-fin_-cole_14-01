@@ -78,20 +78,22 @@ export function MarketingView() {
             </header>
 
             <div className="p-4 bg-white/5 border border-white/10 rounded-2xl max-w-4xl mx-auto mt-8">
-                <MarketingFilters
-                    categories={['Digital', 'Print', 'Social Media']}
-                    statuses={['Draft', 'In Progress', 'Validated', 'Rejected']}
-                    selectedCategory={filters.category}
-                    selectedStatus={filters.status}
-                    onCategoryChange={(category) => setFilters((prev) => ({ ...prev, category }))}
-                    onStatusChange={(status) => setFilters((prev) => ({ ...prev, status }))}
-                />
-                <button
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg ml-4"
-                    onClick={resetFilters}
-                >
-                    Réinitialiser
-                </button>
+                <div className="flex items-center gap-4 w-full">
+                    <MarketingFilters
+                        categories={['Digital', 'Print', 'Social Media']}
+                        statuses={['Draft', 'In Progress', 'Validated', 'Rejected']}
+                        selectedCategory={filters.category}
+                        selectedStatus={filters.status}
+                        onCategoryChange={(category) => setFilters((prev) => ({ ...prev, category }))}
+                        onStatusChange={(status) => setFilters((prev) => ({ ...prev, status }))}
+                    />
+                    <button
+                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg ml-auto"
+                        onClick={resetFilters}
+                    >
+                        Réinitialiser
+                    </button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-6xl mx-auto mt-8">

@@ -13,11 +13,10 @@ export function AccountingView() {
   const [summary, setSummary] = useState<FinancialSummary>({ revenue: 0, expenses: 0, profit: 0 });
   const [loading, setLoading] = useState(true);
 
+  // Fetch sales data
   const fetchSalesData = async () => {
     try {
-      console.log('Fetching sales data');
       const salesData = await salesApi.getAllSales();
-      console.log('Sales data:', salesData);
       const salesTransactions: Transaction[] = salesData.map((sale: any) => ({
         id: sale._id,
         date: sale.date,
@@ -33,11 +32,10 @@ export function AccountingView() {
     }
   };
 
+  // Fetch stock data
   const fetchStockData = async () => {
     try {
-      console.log('Fetching stock data');
       const stockData = await stockApi.getAllStock();
-      console.log('Stock data:', stockData);
       const stockTransactions: Transaction[] = stockData.map((item: any) => ({
         id: item.id || item._id,
         date: item.createdAt.toISOString().split('T')[0],
@@ -53,11 +51,10 @@ export function AccountingView() {
     }
   };
 
+  // Fetch declarations data
   const fetchDeclarationsData = async () => {
     try {
-      console.log('Fetching declarations data');
       const declarationsData = await declarationApi.getAllDeclarations();
-      console.log('Declarations data:', declarationsData);
       const paidDeclarations = declarationsData.filter((declaration: any) => declaration.isPaid);
       const declarationTransactions: Transaction[] = paidDeclarations.map((declaration: any) => {
         const reducedAmount = declaration.amount * 0.123; // Apply 12.3% to the amount
@@ -77,60 +74,54 @@ export function AccountingView() {
     }
   };
 
+  // Fetch marketing data
   const fetchMarketingData = async () => {
     try {
-      console.log('Fetching marketing expenses data');
-      const marketingData = await marketingApi.getAllMarketingExpenses();
-      console.log('Marketing expenses data:', marketingData);
+      const marketingData = await marketingApi.getAllCampaigns();
+      const marketingTransactions: Transaction[] = marketingData
+        .filter((campaign: any) => campaign.adBudget > 0) // Ensure the adBudget is greater than 0
+        .map((campaign: any) => {
+          const createdAt = new Date(campaign.createdAt);
+          const postDate = campaign.postDate ? new Date(campaign.postDate) : null;
+          const date = !isNaN(createdAt.getTime()) ? createdAt.toISOString().split('T')[0] : (postDate ? postDate.toISOString().split('T')[0] : '2025-02-21'); // Use postDate or default date if invalid
 
-      if (marketingData.length === 0) {
-        console.log('No marketing expenses found');
-      } else {
-        console.log('Marketing expenses found:', marketingData);
-      }
+          // Capitalize the first letter of the description (platform)
+          const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+          const description = campaign.platform ? capitalize(campaign.platform) : 'No Description';
 
-      const marketingTransactions: Transaction[] = marketingData.filter((expense: any) => {
-        console.log('Checking expense:', expense);
-        return expense.amount > 0; // Ensure that amount is used instead of adBudget
-      }).map((expense: any) => ({
-        id: expense._id,
-        date: expense.date,
-        category: 'Marketing',
-        description: expense.description || 'No Description',
-        amount: expense.amount || 0,
-        type: 'expense' as const,
-      }));
-
-      console.log('Processed marketing transactions:', marketingTransactions);
+          return {
+            id: campaign._id,
+            date,
+            category: 'Marketing',
+            description, // Use capitalized description
+            amount: campaign.adBudget || 0,
+            type: 'expense' as const,
+          };
+        });
       return marketingTransactions;
     } catch (error) {
-      console.error('Erreur lors de la récupération des dépenses marketing:', error);
+      console.error('Erreur lors de la récupération des campagnes marketing:', error);
       return [];
     }
   };
 
+  // Fetch all data and combine transactions
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      console.log('Fetching all data');
       const salesTransactions = await fetchSalesData();
       const stockTransactions = await fetchStockData();
       const declarationTransactions = await fetchDeclarationsData();
       const marketingTransactions = await fetchMarketingData();
-      console.log('Marketing Transactions:', marketingTransactions);
 
-      // Combine transactions
       const allTransactions = [...salesTransactions, ...stockTransactions, ...declarationTransactions, ...marketingTransactions];
       setTransactions(allTransactions);
-      console.log('All transactions:', allTransactions);
 
-      // Calculate summary
       const revenue = salesTransactions.reduce((acc, trans) => acc + trans.amount, 0);
       const expenses = [...stockTransactions, ...declarationTransactions, ...marketingTransactions].reduce((acc, trans) => acc + trans.amount, 0);
       const profit = revenue - expenses;
 
       setSummary({ revenue, expenses, profit });
-      console.log('Summary:', { revenue, expenses, profit });
       setLoading(false);
     };
 
@@ -141,7 +132,6 @@ export function AccountingView() {
     return <div className="flex items-center justify-center h-screen">Chargement...</div>;
   }
 
-  // Prepare data for chart
   const chartData = transactions.map(transaction => ({
     date: transaction.date,
     amount: transaction.type === 'income' ? transaction.amount : -transaction.amount,

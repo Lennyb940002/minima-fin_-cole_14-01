@@ -14,6 +14,8 @@ export interface IMarketingCampaign extends Document {
     platform: string;
     content?: string;
     objective?: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const marketingCampaignSchema = new Schema<IMarketingCampaign>({
@@ -64,7 +66,8 @@ const marketingCampaignSchema = new Schema<IMarketingCampaign>({
         type: String
     }
 }, {
-    collection: 'marketing' // Nom de la collection dans MongoDB
+    timestamps: true,  // This will automatically add `createdAt` and `updatedAt` fields
+    collection: 'marketing' // Name of the collection in MongoDB
 });
 
 export const MarketingCampaign = mongoose.model<IMarketingCampaign>('MarketingCampaign', marketingCampaignSchema);
