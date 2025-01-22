@@ -5,7 +5,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { authRouter } from './routes/authRoutes';
 import { stockRouter } from './routes/stockRoutes';
-import { saleRouter } from './routes/saleRoutes';
+import saleRouter from './routes/saleRoutes';;
 import { productRouter } from './routes/productRoutes';
 import { declarationRouter } from './routes/declarationRoutes'; // Importer le routeur des déclarations
 import { marketingRouter } from './routes/marketingRoutes';

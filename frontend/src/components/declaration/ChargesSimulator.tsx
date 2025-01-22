@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Calculator, Settings, ArrowRight } from 'lucide-react';
 
-interface ChargesSimulatorProps {
-    onSimulate: (total: number) => void;
+export interface ChargesSimulatorProps {
+    onSimulate: (simulationData: any) => void;
 }
 
 interface TaxRegime {

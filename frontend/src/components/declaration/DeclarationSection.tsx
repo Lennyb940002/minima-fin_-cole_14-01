@@ -3,6 +3,7 @@ import { ArrowRight, ArrowLeft, Calendar } from 'lucide-react';
 
 // Types
 interface Declaration {
+    _id: string;
     date: string;
     amount: number;
     payment: number;
@@ -23,11 +24,14 @@ const MONTHS_IN_FRENCH = [
     "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
 ];
 
-const TAX_RATE = 0.12;
+const TAX_RATE = 0.123;
 const DECLARATION_DEADLINE_DAYS = 90;
 
 // Helper functions
 const formatPeriodLabel = (date: string, periodType: 'monthly' | 'quarterly'): string => {
+    if (!date) {
+        return '';
+    }
     const [year, monthOrQuarter] = date.split('-');
 
     if (periodType === 'monthly') {
@@ -77,7 +81,7 @@ const DeclarationCard = ({
                             Chiffre d'affaires
                         </p>
                         <p className="text-xl font-medium">
-                            {formatCurrency(declaration.payment)}
+                            {formatCurrency(declaration.amount)}
                         </p>
                     </div>
 
@@ -86,7 +90,7 @@ const DeclarationCard = ({
                             Cotisations payées
                         </p>
                         <p className="text-xl font-medium">
-                            {formatCurrency(declaration.amount * TAX_RATE)}
+                            {formatCurrency(declaration.payment)}
                         </p>
                     </div>
                 </div>
@@ -99,7 +103,7 @@ const DeclarationCard = ({
                             Chiffre d'affaires
                         </p>
                         <p className="text-xl font-medium">
-                            {formatCurrency(declaration.payment)}
+                            {formatCurrency(declaration.amount)}
                         </p>
                     </div>
 
@@ -108,7 +112,7 @@ const DeclarationCard = ({
                             Cotisations estimées
                         </p>
                         <p className="text-2xl font-semibold">
-                            {formatCurrency(declaration.amount * TAX_RATE)}
+                            {formatCurrency(declaration.payment)}
                         </p>
                     </div>
                 </div>
@@ -162,7 +166,7 @@ export function DeclarationSection({
                 {items.length > 0 ? (
                     items.map((declaration) => (
                         <DeclarationCard
-                            key={declaration.date}
+                            key={declaration._id} // Utilisation de _id comme clé unique
                             declaration={declaration}
                             onDeclare={onDeclare}
                             onSimulate={onSimulate}

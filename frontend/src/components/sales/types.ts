@@ -6,11 +6,10 @@ export interface Sale {
   unitCost: number;
   margin: number;
   date: string;
-  paymentMethod: 'cash' | 'card' | 'transfer';
   paymentStatus: 'En attente' | 'Effectué' | 'Annulé';
 }
 
-export type Period = 'day' | 'week' | 'month' | 'year';
+export type Period = 'All' | 'Jour' | 'Semaine' | 'Mois';
 
 export interface SalesChartData {
   date: string;

@@ -19,6 +19,7 @@ export function SalesView() {
 
   const [sales, setSales] = useState<Sale[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentSale, setCurrentSale] = useState<Sale | null>(null);
   const [analytics, setAnalytics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -55,6 +56,16 @@ export function SalesView() {
       setIsModalOpen(false);
     } catch (error) {
       console.error('Error adding sale:', error);
+    }
+  };
+
+  const handleUpdateSale = async (id: string, updatedSale: Partial<Sale>) => {
+    try {
+      await salesApi.updateSale(id, updatedSale);
+      await fetchSalesData();
+      await fetchAnalytics();
+    } catch (error) {
+      console.error('Error updating sale:', error);
     }
   };
 
@@ -95,7 +106,7 @@ export function SalesView() {
   };
 
   // Filter out cancelled sales
-  const validSales = sales.filter(sale => sale.paymentStatus !== 'cancelled');
+  const validSales = sales.filter(sale => sale.paymentStatus !== 'Annulé');
 
   const filteredRevenueSales = filterSalesByPeriod(validSales, revenuePeriod);
   const filteredTotalSales = filterSalesByPeriod(validSales, totalSalesPeriod);
@@ -110,7 +121,7 @@ export function SalesView() {
   const totalBenefit = filteredBenefitSales.reduce((sum, sale) => sum + sale.margin, 0);
 
   return (
-    <div className=" relative space-y-6">
+    <div className="relative space-y-6">
       <header className='border-b border-white/10 h-12'>
         <h2 className="text-2xl font-bold">Gestion de Vente</h2>
       </header>
@@ -192,23 +203,36 @@ export function SalesView() {
           <h2 className="text-xl font-bold">Tableau des ventes</h2>
           <button
             className="bg-yellow-500 text-black px-4 py-2 rounded-lg flex items-center gap-2"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setIsModalOpen(true);
+              setCurrentSale(null); // Reset current sale when adding a new sale
+            }}
           >
             <Plus className="w-4 h-4" />
             Ajouter Vente
           </button>
         </div>
-        <SalesTable sales={sales} onDelete={handleDeleteSale} />
+        <SalesTable
+          sales={sales}
+          onDelete={handleDeleteSale}
+          onUpdate={(id, sale) => {
+            setCurrentSale({ _id: id, ...sale } as Sale); // Ensure all properties are defined
+            setIsModalOpen(true);
+          }}
+        />
       </div>
 
       <ProductModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddSale}
+        onSubmit={currentSale ? (updatedSale) => handleUpdateSale(currentSale._id, updatedSale) : handleAddSale}
+        initialData={currentSale || undefined} // Ensure type compatibility
       />
 
-      <NavigationArrow direction="left" link="/previous-page" />
-      <NavigationArrow direction="right" link="/next-page" />
+      <NavigationArrow direction="left" target="/previous-page" />
+      <NavigationArrow direction="right" target="/next-page" />
     </div>
   );
 }
+
+export default SalesView;

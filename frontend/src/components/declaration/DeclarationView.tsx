@@ -3,8 +3,10 @@ import { Link2 } from 'lucide-react';
 import { ChargesSimulator } from './ChargesSimulator';
 import DeclarationTabs from './DeclarationTabs';
 import { DeclarationSection } from './DeclarationSection';
-import { declarationApi } from '../../services/declarationApi';
+import { salesApi } from '../../services/api';
 import { Declaration } from './types';
+
+const TAX_RATE = 0.123;
 
 export function DeclarationView() {
   const [activeTab, setActiveTab] = useState<'monthly' | 'quarterly'>('monthly');
@@ -19,14 +21,12 @@ export function DeclarationView() {
   useEffect(() => {
     const fetchDeclarations = async () => {
       try {
-        const declarationsData = await declarationApi.getAllDeclarations();
-        const paid = declarationsData.filter((d: Declaration) => d.isPaid);
-        const notPaid = declarationsData.filter((d: Declaration) => !d.isPaid);
+        const salesData = await salesApi.getAllSales();
+        const groupedSales = groupSalesByMonth(salesData);
 
-        setDeclarations([...new Map(notPaid.map(item => [item._id, item])).values()]);
-        setPaidDeclarations([...new Map(paid.map(item => [item._id, item])).values()]);
+        setDeclarations(groupedSales);
       } catch (error) {
-        console.error('Error fetching declarations:', error);
+        console.error('Error fetching sales:', error);
       } finally {
         setLoading(false);
       }
@@ -34,6 +34,27 @@ export function DeclarationView() {
 
     fetchDeclarations();
   }, []);
+
+  const groupSalesByMonth = (sales: any[]): Declaration[] => {
+    const grouped = sales.reduce((acc, sale) => {
+      const date = new Date(sale.date);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Convert month to 2-digit format
+      const period = `${year}-${month}`;
+
+      if (!acc[period]) {
+        acc[period] = { date: period, amount: 0, payment: 0, isPaid: false };
+      }
+      acc[period].amount += sale.salePrice;
+      acc[period].payment = acc[period].amount * TAX_RATE;
+      return acc;
+    }, {});
+
+    return Object.keys(grouped).map(period => ({
+      _id: period,
+      ...grouped[period]
+    }));
+  };
 
   const handleSimulate = (declaration: Declaration) => {
     console.log('Total charges:', declaration.amount);
@@ -53,12 +74,10 @@ export function DeclarationView() {
     if (selectedDeclaration && selectedDeclaration._id) {
       console.log('Confirming declaration with ID:', selectedDeclaration._id);
       try {
-        await declarationApi.updateDeclarationStatus(selectedDeclaration._id, true);
+        await salesApi.updateSale(selectedDeclaration._id, { isPaid: true });
 
-        // Mettre à jour les déclarations après confirmation
         setDeclarations(prevDeclarations => prevDeclarations.filter(decl => decl._id !== selectedDeclaration._id));
 
-        // Ajouter uniquement si l'ID n'existe pas déjà dans paidDeclarations
         setPaidDeclarations(prevPaidDeclarations => {
           const updatedPaidDeclarations = new Map(prevPaidDeclarations.map(item => [item._id, item]));
           updatedPaidDeclarations.set(selectedDeclaration._id, { ...selectedDeclaration, isPaid: true });

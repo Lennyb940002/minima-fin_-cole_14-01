@@ -1,92 +1,28 @@
 import React, { useState } from 'react';
-import { Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { Trash2, Edit2 } from 'lucide-react';
 import { Sale } from './types';
 import { formatCurrency, formatDate } from '../../utils/formatters';
+import { ProductModal } from './ProductModal';
 
 interface SalesTableProps {
     sales: Sale[];
     onDelete: (id: string) => void;
+    onUpdate: (id: string, sale: Partial<Sale>) => void;
 }
 
-export function SalesTable({ sales, onDelete }: SalesTableProps) {
+export function SalesTable({ sales, onDelete, onUpdate }: SalesTableProps) {
     const [confirmationId, setConfirmationId] = useState<string | null>(null);
-    const [sortField, setSortField] = useState<keyof Sale | null>(null);
-    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+    const [editSale, setEditSale] = useState<Sale | null>(null);
 
-    const getStatusStyle = (status: string) => {
-        switch (status.toLowerCase()) {
-            case 'effectué':
-                return 'bg-green-500/20 text-green-400';
-            case 'en attente':
-                return 'bg-yellow-500/20 text-yellow-400';
-            case 'annulé':
-                return 'bg-red-500/20 text-red-400';
-            default:
-                return 'bg-gray-500/20 text-gray-400';
-        }
+    const handleEdit = (sale: Sale) => {
+        setEditSale(sale);
     };
 
-    const handleSort = (field: keyof Sale) => {
-        if (sortField === field) {
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortField(field);
-            setSortDirection('asc');
+    const handleUpdateSale = (updatedSale: Omit<Sale, '_id'>) => {
+        if (editSale) {
+            onUpdate(editSale._id, updatedSale);
+            setEditSale(null);
         }
-    };
-
-    const sortedSales = [...sales].sort((a, b) => {
-        if (!sortField) return 0;
-
-        const aValue = a[sortField];
-        const bValue = b[sortField];
-
-        if (typeof aValue === 'number' && typeof bValue === 'number') {
-            return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
-        }
-
-        if (typeof aValue === 'string' && typeof bValue === 'string') {
-            return sortDirection === 'asc'
-                ? aValue.localeCompare(bValue)
-                : bValue.localeCompare(aValue);
-        }
-
-        return 0;
-    });
-
-    const handleDelete = (id: string) => {
-        setConfirmationId(id);
-    };
-
-    const confirmDelete = () => {
-        if (confirmationId) {
-            onDelete(confirmationId);
-            setConfirmationId(null);
-        }
-    };
-
-    const cancelDelete = () => {
-        setConfirmationId(null);
-    };
-
-    const renderSortIcon = (field: keyof Sale) => {
-        const isActive = sortField === field;
-        return (
-            <button
-                onClick={() => handleSort(field)}
-                className={`
-                    ml-1 inline-flex items-center rounded-full p-1
-                    ${isActive ? 'text-white' : 'text-white/60'}
-                    hover:text-white transition-colors
-                `}
-            >
-                {isActive && sortDirection === 'asc' ? (
-                    <ChevronUp className="w-3 h-3" />
-                ) : (
-                    <ChevronDown className="w-3 h-3" />
-                )}
-            </button>
-        );
     };
 
     return (
@@ -95,34 +31,18 @@ export function SalesTable({ sales, onDelete }: SalesTableProps) {
                 <table className="w-full">
                     <thead>
                         <tr className="border-b border-white/10">
-                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">
-                                Produit {renderSortIcon('product')}
-                            </th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">
-                                Quantité {renderSortIcon('quantity')}
-                            </th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">
-                                Prix Unitaire {renderSortIcon('salePrice')}
-                            </th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">
-                                Total
-                            </th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">
-                                Marge {renderSortIcon('margin')}
-                            </th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">
-                                Date {renderSortIcon('date')}
-                            </th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">
-                                État {renderSortIcon('paymentStatus')}
-                            </th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">
-                                Actions
-                            </th>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Produit</th>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Quantité</th>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Prix Unitaire</th>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Total</th>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Marge</th>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Date</th>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">État</th>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {sortedSales.map((sale) => (
+                        {sales.map((sale) => (
                             <tr key={sale._id} className="border-b border-white/10 hover:bg-white/10 transition-colors">
                                 <td className="px-4 py-3 text-sm text-white">{sale.product}</td>
                                 <td className="px-4 py-3 text-sm text-white text-right">{sale.quantity}</td>
@@ -137,14 +57,20 @@ export function SalesTable({ sales, onDelete }: SalesTableProps) {
                                 </td>
                                 <td className="px-4 py-3 text-sm text-white">{formatDate(sale.date)}</td>
                                 <td className="px-4 py-3 text-sm">
-                                    <span className={`px-2 py-1 rounded-full text-xs ${getStatusStyle(sale.paymentStatus)}`}>
+                                    <span className={`px-2 py-1 rounded-full text-xs`}>
                                         {sale.paymentStatus}
                                     </span>
                                 </td>
-                                <td className="px-4 py-3 text-sm">
+                                <td className="px-4 py-3 text-sm flex space-x-2">
                                     <button
                                         className="p-2 hover:bg-white/10 rounded-full transition-all duration-150"
-                                        onClick={() => handleDelete(sale._id)}
+                                        onClick={() => handleEdit(sale)}
+                                    >
+                                        <Edit2 className="w-4 h-4 text-yellow-500" />
+                                    </button>
+                                    <button
+                                        className="p-2 hover:bg-white/10 rounded-full transition-all duration-150"
+                                        onClick={() => setConfirmationId(sale._id)}
                                     >
                                         <Trash2 className="w-4 h-4 text-red-500" />
                                     </button>
@@ -164,19 +90,31 @@ export function SalesTable({ sales, onDelete }: SalesTableProps) {
                         <div className="flex justify-end space-x-4">
                             <button
                                 className="px-6 py-2.5 text-sm font-medium bg-zinc-800 text-white rounded-full hover:bg-zinc-700 transition-colors duration-150"
-                                onClick={cancelDelete}
+                                onClick={() => setConfirmationId(null)}
                             >
                                 Annuler
                             </button>
                             <button
                                 className="px-6 py-2.5 text-sm font-medium bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-150"
-                                onClick={confirmDelete}
+                                onClick={() => {
+                                    onDelete(confirmationId);
+                                    setConfirmationId(null);
+                                }}
                             >
                                 Supprimer
                             </button>
                         </div>
                     </div>
                 </div>
+            )}
+
+            {editSale && (
+                <ProductModal
+                    isOpen={!!editSale}
+                    onClose={() => setEditSale(null)}
+                    onSubmit={handleUpdateSale}
+                    initialData={editSale}
+                />
             )}
         </div>
     );

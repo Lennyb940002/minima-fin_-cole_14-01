@@ -71,7 +71,7 @@ export function EcommerceDashboard() {
   if (activeModule === 'marketing') return <MarketingCalendar />;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6 mt-14">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6 mt-28">
       {modules.map((module) => (
         <div
           key={module.id}

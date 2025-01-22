@@ -1,25 +1,26 @@
-// src/components/declaration/types.ts
-
-export interface Declaration {
-  id: string;
-  status: 'pending' | 'paid' | 'processing';
-  paymentDate?: string;
-  lastModified: string;
-  type: string;
-  dueDate: string;
-  amount: number;
-  submissionDate?: string;
-  isPaid: boolean;
-  // Ajout des champs manquants
+export interface Sale {
+  _id: string;
+  userId: string;
+  product: string;
+  quantity: number;
+  salePrice: number;
+  unitCost?: number;
+  paymentStatus: string;
   date: string;
-  payment: number;
+  margin: number;
+  decStatus: string;
+  __v?: number;
 }
 
-export class DeclarationError extends Error {
-  code: string;
-
-  constructor({ message, code }: { message: string; code: string }) {
-    super(message);
-    this.code = code;
-  }
+export interface Declaration {
+  _id: string;
+  date: string;
+  amount: number;
+  payment: number;
+  isPaid: boolean;
+  sales: Sale[];
+  status?: string;
+  lastModified?: Date;
+  type?: string;
+  dueDate?: Date;
 }

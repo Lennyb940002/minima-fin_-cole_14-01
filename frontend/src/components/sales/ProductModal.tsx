@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Sale } from './types';
 
@@ -6,6 +6,7 @@ interface ProductModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (sale: Omit<Sale, '_id'>) => void;
+    initialData?: Sale;
 }
 
 const initialFormState = {
@@ -13,35 +14,39 @@ const initialFormState = {
     quantity: '',
     salePrice: '',
     unitCost: '',
-    client: '',
-    paymentMethod: 'cash' as const,
-    paymentStatus: 'pending' as const,
-    notes: ''
+    paymentStatus: 'En attente' as const
 };
 
-export function ProductModal({ isOpen, onClose, onSubmit }: ProductModalProps) {
-    const [formData, setFormData] = useState(initialFormState);
+export function ProductModal({ isOpen, onClose, onSubmit, initialData }: ProductModalProps) {
+    const [formData, setFormData] = useState({
+        ...initialFormState,
+        ...initialData
+    });
+
     const [error, setError] = useState<string | null>(null);
 
-    if (!isOpen) return null;
+    useEffect(() => {
+        if (initialData) {
+            setFormData({
+                product: initialData.product,
+                quantity: initialData.quantity.toString(),
+                salePrice: initialData.salePrice.toString(),
+                unitCost: initialData.unitCost.toString(),
+                paymentStatus: initialData.paymentStatus
+            });
+        }
+    }, [initialData]);
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
         const { name, value } = e.target;
 
-        if (name === 'quantity' || name === 'salePrice' || name === 'unitCost') {
-            if (value === '' || (!isNaN(Number(value)) && Number(value) >= 0)) {
-                setFormData(prev => ({ ...prev, [name]: value }));
-            }
-        } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
-        }
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(null);
 
         try {
             const quantity = Number(formData.quantity);
@@ -60,10 +65,7 @@ export function ProductModal({ isOpen, onClose, onSubmit }: ProductModalProps) {
                 quantity,
                 salePrice,
                 unitCost,
-                client: formData.client || "Client anonyme",
-                paymentMethod: formData.paymentMethod,
                 paymentStatus: formData.paymentStatus,
-                notes: formData.notes,
                 date: new Date().toISOString(),
                 margin
             };
@@ -78,6 +80,8 @@ export function ProductModal({ isOpen, onClose, onSubmit }: ProductModalProps) {
         }
     };
 
+    if (!isOpen) return null;
+
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50">
             {/* Overlay avec effet de flou */}
@@ -89,7 +93,7 @@ export function ProductModal({ isOpen, onClose, onSubmit }: ProductModalProps) {
                 <div className="flex justify-between items-start mb-8">
                     <div className="space-y-1">
                         <h2 className="text-2xl font-semibold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-                            Nouvelle Vente
+                            {initialData ? 'Modifier Vente' : 'Nouvelle Vente'}
                         </h2>
                     </div>
                     <button
@@ -198,7 +202,7 @@ export function ProductModal({ isOpen, onClose, onSubmit }: ProductModalProps) {
                             type="submit"
                             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition"
                         >
-                            Ajouter la vente
+                            {initialData ? 'Mettre à jour' : 'Ajouter la vente'}
                         </button>
                     </div>
                 </form>

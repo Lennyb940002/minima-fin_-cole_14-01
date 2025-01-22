@@ -6,12 +6,10 @@ export interface ISale extends Document {
     quantity: number;
     salePrice: number;
     unitCost: number;
-    client: string;
-    paymentMethod: string;
     paymentStatus: string;
-    notes: string;
     date: Date;
     margin: number;
+    decStatus: string;
 }
 
 const saleSchema = new Schema<ISale>({
@@ -36,20 +34,9 @@ const saleSchema = new Schema<ISale>({
         type: Number,
         required: true
     },
-    client: {
-        type: String,
-        required: true
-    },
-    paymentMethod: {
-        type: String,
-        required: true
-    },
     paymentStatus: {
         type: String,
         required: true
-    },
-    notes: {
-        type: String
     },
     date: {
         type: Date,
@@ -58,6 +45,10 @@ const saleSchema = new Schema<ISale>({
     margin: {
         type: Number,
         required: true
+    },
+    decStatus: {
+        type: String,
+        default: '1.0.0'
     }
 });
 
